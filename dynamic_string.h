@@ -1,5 +1,8 @@
 /* IFJ 2022 */
 
+#ifndef _DYNAMIC_STRING_H
+#define _DYNAMIC_STRING_H
+
 #include <stdbool.h>
 #include <string.h>
 #include <stdlib.h>
@@ -25,3 +28,5 @@ void add_char_to_string(dynamic_string* string, char character);
 
 //adding whole string to a dynamic string
 void add_str_to_string(dynamic_string* string, char* new_string);
+
+#endif // _DYNAMIC_STRING_H
