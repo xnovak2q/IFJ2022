@@ -1,5 +1,5 @@
 //
-// Created by Lakluk on 15.10.2022.
+// Created by xfuisl00 on 15.10.2022.
 //
 
 #ifndef IFJ2022_BASICSCANNERFUNCTIONS_H
@@ -14,7 +14,7 @@ bool isLetterUnder(char x);
 bool isLetterUnderNumber(char x);
 bool isKeyword(dynamic_string *x);
 bool isQuot(char x);
-bool isBackSlash(char x);
+bool isBackslash(char x);
 bool isDot(char x);
 bool isE(char x);
 bool isMinus(char x);
@@ -33,6 +33,7 @@ bool isQuestion(char x);
 bool isLetter(char x);
 bool isType(dynamic_string *x);
 bool isDollar(char x);
-bool isValid(char x);
+bool isValidText(char x);
+bool isValidOper(char x);
 
 #endif //IFJ2022_BASICSCANNERFUNCTIONS_H

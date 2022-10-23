@@ -4,14 +4,19 @@
 
 void initialize_string(dynamic_string* string)
 {
+    printf("initialize_string\n");
     string->string = (char*)malloc(DYNSTR_LEN);
     if (!string->string)
     {
         exit(99);
     }
+    printf("malloced\n");
     string->allocated_length = DYNSTR_LEN;
+    printf("dynstr len\n");
     string->string_length = 0;
+    printf("strlen\n");
     string->string[string->string_length] = '\0';
+    printf("going home\n");
 }
 
 void free_string(dynamic_string* string)

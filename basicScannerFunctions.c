@@ -1,5 +1,5 @@
 //
-// Created by Lakluk on 15.10.2022
+// Created by xfuisl00 on 15.10.2022
 //
 
 #include "basicScannerFunctions.h"
@@ -56,10 +56,13 @@ bool isOperator(char x){
         case '*':
         case '(':
         case ')':
+        case '{':
+        case '}':
+        case '[':
+        case ']':
         case '>':
         case '<':
         case '~':
-        case ':':
         case ',':
             return true;
         default:
@@ -118,6 +121,10 @@ bool isDollar(char x){
     return x == '$';
 }
 
-bool isValid(char x){
+bool isValidText(char x){
     return isOperator(x) || isspace(x);
+}
+
+bool isValidOper(char x){
+    return isLetterUnder(x) || isdigit(x) || isDollar(x) || x == ' ';
 }

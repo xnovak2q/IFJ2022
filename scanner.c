@@ -1,90 +1,81 @@
 #include "scanner.h"
-#include "dynamic_string.h"
 
 char input;
 
-token* Scanner(){
-    getHeader();
+token* GetToken() {
     input = getchar();
-    while(isspace(input)){
-        input = getchar();
+    if (isQuestion(input)) {
+        return Type();
     }
-    if(input == 'd'){
-        getDeclare();
+    if (isLetterUnder(input)) {
+        return Word();
     }
-    bool end = false;
-    while(!end){
-        input = getchar();
-        if(!isspace(input)){
-            if(isQuestion(input)){
-                return Type();
-            }
-            if(isLetterUnder(input)){
-                return Word();
-            }
-            if(isDollar(input)){
-                return Variable();
-            }
-            if(isdigit(input)){
-                return Number();
-            }
-            if(isQuot(input)){
-                return String();
-            }
-        }
+    if (isDollar(input)) {
+        return Variable();
+    }
+    if (isdigit(input)) {
+        return Number();
+    }
+    if (isQuot(input)) {
+        return String();
+    }
+    if (isOperator(input)) {
+        return Operator();
     }
 }
 
-void getHeader(){
-    while(true){
-        input = getchar();
-        if(input == '<'){
+token* Prolog(token* tok) {
+    char tmp1 = getchar();
+    char tmp2 = getchar();
+    char tmp3 = getchar();
+    if (tmp1 != 'p' || tmp2 != 'h' || tmp3 != 'p') {
+        exit(2);
+    }
+    input = getchar();
+    if (!isspace(input)) {
+        if (isSlash(input)) {
             input = getchar();
-            if(input == '?'){
-                char tmp1 = getchar();
-                char tmp2 = getchar();
-                char tmp3 = getchar();
-                if(tmp1 != 'p' || tmp2 != 'h' || tmp3 != 'p'){
-                    exit(2);
+            if (isSlash(input)) {
+                skipLineComment();
+            } else {
+                if (isStar(input)) {
+                    skipBlockComment();
                 }
-                input = getchar();
-                if(!isspace(input)){
-                    if(isSlash(input)){
-                        input = getchar();
-                        if(isSlash(input)){
-                            skipLineComment();
-                        } else{
-                            if (isStar(input)){
-                                skipBlockComment();
-                            }
-                        }
-                    }
-                    else{
-                        exit(2);
-                    }
-                }
-                return;
             }
+        } else {
+            exit(2);
         }
     }
+    tok->tokenType = prolog;
+    return tok;
 }
 
-void getDeclare(){
-    char *compare = "declare(strict_types=1);";
-    for(int i = 0; i < sizeof compare; i++){
-        if(input != compare[i]){
-            exit(1);
-        }
+token* Declare(token* tok){
+    input = getchar();
+    if(!isOpenBracket(input)){
+        exit(1);
+    }
+    free_string(tok->value);
+    initialize_string(tok->value);
+    input = getchar();
+    while(!isCloseBracket(input)){
+        add_char_to_string(tok->value,input);
         input = getchar();
     }
+    tok->tokenType = declare;
+    return tok;
 }
 
 token* makeToken(){
-    token * tokenToMake = malloc(sizeof token);
+    printf("makeToken\n");
+    dynamic_string string;
+    initialize_string(&string);
+    token * tokenToMake = (token*)malloc(sizeof (token));
     if(!tokenToMake){
         exit(99);
     }
-    initialize_string(tokenToMake->value);
+    tokenToMake->value = &string;
+    printf("madeToken\n");
     return tokenToMake;
 }
 
@@ -93,6 +84,10 @@ token* Type(){
     tokenToMake->tokenType = type;
     add_char_to_string(tokenToMake->value, input);
     input = getchar();
+    if(input == '>'){
+        tokenToMake->tokenType = end;
+        return tokenToMake;
+    }
     while(isalpha(input)){
         add_char_to_string(tokenToMake->value, input);
         input = getchar();
@@ -100,7 +95,7 @@ token* Type(){
     if(!isType(tokenToMake->value)){
         exit(1);
     }
-    if(!isValid(input)){
+    if(!isValidText(input)){
         exit(1);
     }
     return tokenToMake;
@@ -115,13 +110,16 @@ token* Word(){
         input = getchar();
     }
     tokenToMake->tokenType = identificator;
+    if(strcmp(tokenToMake->value->string, "declare") == 0){
+        return Declare(tokenToMake);
+    }
     if(isType(tokenToMake->value)){
         tokenToMake->tokenType = type;
     }
     if(isKeyword(tokenToMake->value)){
         tokenToMake->tokenType = keyword;
     }
-    if(!isValid(input)){
+    if(!isValidText(input)){
         exit(1);
     }
     return tokenToMake;
@@ -135,7 +133,7 @@ token* Variable(){
         add_char_to_string(tokenToMake->value, input);
         input = getchar();
     }
-    if(!isValid(input)){
+    if(!isValidText(input)){
         exit(1);
     }
     return tokenToMake;
@@ -158,7 +156,7 @@ token* Number(){
         add_char_to_string(tokenToMake->value, input);
         return Exponent(tokenToMake);
     }
-    if(!isValid(input)){
+    if(!isValidText(input)){
         exit(1);
     }
     return tokenToMake;
@@ -174,7 +172,7 @@ token* Exponent(token* tok){
         add_char_to_string(tok->value, input);
         input = getchar();
     }
-    if(!isValid(input)){
+    if(!isValidText(input)){
         exit(1);
     }
     tok->tokenType = exponent;
@@ -191,7 +189,7 @@ token* Float(token* tok){
         add_char_to_string(tok->value, input);
         return Exponent(tok);
     }
-    if(!isValid(input)){
+    if(!isValidText(input)){
         exit(1);
     }
     tok->tokenType = ffloat;
@@ -203,7 +201,137 @@ token* String(){
     token *tokenToMake = makeToken();
     tokenToMake->tokenType = string;
     char prevChar;
-    while(!isQuot(input) || isBackSlash(prevChar)){
-        add_char_to_string(tok->value, input);
+    while(!isQuot(input) || isBackslash(prevChar)){
+        //TODO escape sekvence
+        if(isBackslash(input)){
+
+        }
+        add_char_to_string(tokenToMake->value, input);
     }
+    input = getchar();
+    if(isValidText(input)){
+        return tokenToMake;
+    }
+    exit(1);
+}
+
+token* Operator(){
+    token *tokenToMake = makeToken();
+    char nextChar = getchar();
+    switch (input) {
+        case '<':
+            if(nextChar == '?'){
+                return Prolog(tokenToMake);
+            }
+            if(nextChar == '=') {
+                tokenToMake->tokenType = lowerEqual;
+                add_str_to_string(tokenToMake->value, "<=");
+            }
+            else{
+                tokenToMake->tokenType = lower;
+                add_char_to_string(tokenToMake->value, '<');
+            }
+            input = getchar();
+            if(isValidOper(input)){
+                return tokenToMake;
+            }
+            exit(1);
+        case '>':
+            if(nextChar == '=') {
+                tokenToMake->tokenType = greaterEqual;
+                add_str_to_string(tokenToMake->value, ">=");
+            }
+            else{
+                tokenToMake->tokenType = greater;
+                add_char_to_string(tokenToMake->value, '>');
+            }
+            input = getchar();
+            if(isValidOper(input)){
+                return tokenToMake;
+            }
+            exit(1);
+        case '=':
+            if(nextChar == '=') {
+                nextChar = getchar();
+                if (nextChar == '=') {
+                    tokenToMake->tokenType = cmpEqual;
+                    add_str_to_string(tokenToMake->value, "===");
+                } else {
+                    exit(1);
+                }
+            }
+            else{
+                if(isValidOper(nextChar)){
+                    tokenToMake->tokenType = equal;
+                    add_char_to_string(tokenToMake->value, '=');
+                    ungetc(nextChar, stdin);
+                } else{
+                    exit(1);
+                }
+            }
+            return tokenToMake;
+        case '!':
+            if(!isEqual(nextChar)){
+                exit(1);
+            }
+            nextChar = getchar();
+            if(!isEqual(nextChar)){
+                exit(1);
+            }
+            tokenToMake->tokenType = notEquals;
+            add_str_to_string(tokenToMake->value, "!==");
+            return tokenToMake;
+        case '{':
+            tokenToMake->tokenType = openCurly;
+            add_char_to_string(tokenToMake->value, '{');
+            break;
+        case '}':
+            tokenToMake->tokenType = closeCurly;
+            add_char_to_string(tokenToMake->value, '}');
+            break;
+        case '[':
+            tokenToMake->tokenType = openSquare;
+            add_char_to_string(tokenToMake->value, '[');
+            break;
+        case ']':
+            tokenToMake->tokenType = closeSquare;
+            add_char_to_string(tokenToMake->value, ']');
+            break;
+        case '(':
+            tokenToMake->tokenType = openBracket;
+            add_char_to_string(tokenToMake->value, '(');
+            break;
+        case ')':
+            tokenToMake->tokenType = closeBracket;
+            add_char_to_string(tokenToMake->value, ')');
+            break;
+        case '+':
+            tokenToMake->tokenType = add;
+            add_char_to_string(tokenToMake->value, '+');
+            break;
+        case '-':
+            tokenToMake->tokenType = sub;
+            add_char_to_string(tokenToMake->value, '-');
+            break;
+        case '*':
+            tokenToMake->tokenType = mul;
+            add_char_to_string(tokenToMake->value, '*');
+            break;
+        case '/':
+            tokenToMake->tokenType = ddiv;
+            add_char_to_string(tokenToMake->value, '/');
+            break;
+        case ',':
+            tokenToMake->tokenType = comma;
+            add_char_to_string(tokenToMake->value, ',');
+            break;
+        case ';':
+            tokenToMake->tokenType = semicolumn;
+            add_char_to_string(tokenToMake->value, ';');
+            break;
+    }
+    if(isValidOper(nextChar)){
+        return tokenToMake;
+    }
+    exit(1);
 }
