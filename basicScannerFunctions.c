@@ -19,13 +19,7 @@ bool isLetterUnder(char x){
 bool isLetterUnderNumber(char x){
     return isLetterUnder(x) || isdigit(x);
 }
-bool isKeyword(dynamic_string *x){
-    for(int i = 0; i < sizeof keywords; i++){
-        if(!strcmp(x->string, keywords[i]))
-            return true;
-    }
-    return false;
-}
+
 bool isQuot(char x){
     return x =='"';
 }
@@ -109,9 +103,17 @@ bool isQuestion(char x){
     return x == '?';
 }
 
-bool isType(dynamic_string *x){
+bool isType(dynamic_string x){
     for(int i = 0; i < sizeof types; i++){
-        if(!strcmp(x->string, types[i]))
+        if(!strcmp(x.string, types[i]))
+            return true;
+    }
+    return false;
+}
+
+bool isKeyword(dynamic_string x){
+    for(int i = 0; i < sizeof keywords; i++){
+        if(!strcmp(x.string, keywords[i]))
             return true;
     }
     return false;

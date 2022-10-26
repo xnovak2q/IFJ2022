@@ -12,7 +12,7 @@
 
 bool isLetterUnder(char x);
 bool isLetterUnderNumber(char x);
-bool isKeyword(dynamic_string *x);
+bool isKeyword(dynamic_string x);
 bool isQuot(char x);
 bool isBackslash(char x);
 bool isDot(char x);
@@ -31,7 +31,7 @@ bool isLine(char x);
 bool isStar(char x);
 bool isQuestion(char x);
 bool isLetter(char x);
-bool isType(dynamic_string *x);
+bool isType(dynamic_string x);
 bool isDollar(char x);
 bool isValidText(char x);
 bool isValidOper(char x);
