@@ -36,10 +36,10 @@ bool isMinus(char x){
     return x == '-';
 }
 bool isOpenBracket(char x){
-    return x == '[';
+    return x == '(';
 }
 bool isCloseBracket(char x){
-    return x == ']';
+    return x == ')';
 }
 bool isMinusPlus(char x){
     return isMinus(x) || x == '+';
@@ -58,6 +58,9 @@ bool isOperator(char x){
         case '<':
         case '~':
         case ',':
+        case ';':
+        case '!':
+        case ':':
             return true;
         default:
             return isMinusPlus(x) || isEqual(x) || isSlash(x);
@@ -104,7 +107,7 @@ bool isQuestion(char x){
 }
 
 bool isType(dynamic_string x){
-    for(int i = 0; i < sizeof types; i++){
+    for(int i = 0; i < 4; i++){
         if(!strcmp(x.string, types[i]))
             return true;
     }
@@ -112,7 +115,7 @@ bool isType(dynamic_string x){
 }
 
 bool isKeyword(dynamic_string x){
-    for(int i = 0; i < sizeof keywords; i++){
+    for(int i = 0; i <= 5; i++){
         if(!strcmp(x.string, keywords[i]))
             return true;
     }
@@ -128,5 +131,5 @@ bool isValidText(char x){
 }
 
 bool isValidOper(char x){
-    return isLetterUnder(x) || isdigit(x) || isDollar(x) || x == ' ';
+    return isLetterUnder(x) || isdigit(x) || isDollar(x) || isspace(x) || isOperator(x)|| x == '"';
 }

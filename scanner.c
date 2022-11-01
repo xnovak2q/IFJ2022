@@ -1,5 +1,6 @@
 #include "scanner.h"
 
+char* tokenTypos[] = {"keyword", "identificator", "variable", "sstring", "type", "integer", "exponent", "ffloat", "add", "sub", "mul", "ddiv", "openBracket", "closeBracket", "openCurly", "closeCurly", "openSquare", "closeSquare", "equal", "cmpEqual", "notEquals", "greater", "lower", "greaterEqual", "lowerEqual", "semicolumn", "end", "declare", "prolog", "comma", "colon"};
 
 token* GetToken() {
     char input = getchar();
@@ -20,6 +21,14 @@ token* GetToken() {
     }
     if (isOperator(input)) {
         return Operator(input);
+    }
+    if(isspace(input)){
+        return GetToken();
+    }
+    if(isEOF(input)){
+        dynamic_string *string = malloc(sizeof(dynamic_string));
+        initialize_string(string);
+        return makeToken(string, end);
     }
 }
 
@@ -64,22 +73,12 @@ token* Declare(dynamic_string* string){
         add_char_to_string(string,input);
         input = getchar();
     }
+    input = getchar();
     if(!isValidText(input)){
         exit(1);
     }
     ungetc(input, stdin);
     return makeToken(string,declare);
-}
-
-token* makeToken(dynamic_string* string, enum tokenType type){
-    token * tokenToMake = (token*)malloc(sizeof (token));
-    if(!tokenToMake){
-        exit(99);
-    }
-    tokenToMake->value = string;
-    tokenToMake->tokenType = type;
-    printf("madeToken %i\n", type);
-    return tokenToMake;
 }
 
 token* Type(char input){
@@ -109,13 +108,12 @@ token* Word(char input){
     initialize_string(string);
     add_char_to_string(string, input);
     input = getchar();
-    printf("%c\n", input);
     while(isLetterUnder(input) || isdigit(input)){
         add_char_to_string(string, input);
         input = getchar();
-        printf("%c\n", input);
     }
     if(strcmp(string->string, "declare") == 0){
+        ungetc(input, stdin);
         return Declare(string);
     }
     if(!isValidText(input)){
@@ -215,6 +213,7 @@ token* String(){
 
         }
         add_char_to_string(string, input);
+        input = getchar();
     }
     input = getchar();
     if(!isValidText(input)){
@@ -227,11 +226,13 @@ token* String(){
 token* Operator(char input){
     dynamic_string* string = malloc(sizeof(dynamic_string));
     initialize_string(string);
-    token *tokenToMake = makeToken(string, -1);
+    token *tokenToMake = makeToken(string, opperator);
+    token *temp;
     char nextChar = getchar();
     switch (input) {
         case '<':
             if(nextChar == '?'){
+                free_token(tokenToMake);
                 return Prolog();
             }
             if(nextChar == '=') {
@@ -267,23 +268,22 @@ token* Operator(char input){
             if(nextChar == '=') {
                 nextChar = getchar();
                 if (nextChar == '=') {
-                    tokenToMake->tokenType = cmpEqual;
                     add_str_to_string(string, "===");
+                    temp = makeToken(string,cmpEqual);
                     nextChar = getchar();
                 } else {
                     exit(1);
                 }
             }
             else{
-                tokenToMake->tokenType = equal;
                 add_char_to_string(string, '=');
+                temp = makeToken(string, equal);
             }
             if(!isValidOper(nextChar)){
                 exit(1);
             }
             ungetc(nextChar, stdin);
-            tokenToMake->value = string;
-            return tokenToMake;
+            return temp;
         case '!':
             if(!isEqual(nextChar)){
                 exit(1);
@@ -292,11 +292,14 @@ token* Operator(char input){
             if(!isEqual(nextChar)){
                 exit(1);
             }
-            tokenToMake->tokenType = notEquals;
             add_str_to_string(string, "!==");
-            tokenToMake->value = string;
+            temp = makeToken(string, notEquals);
             ungetc(nextChar, stdin);
-            return tokenToMake;
+            return temp;
+        case ':':
+            tokenToMake->tokenType = colon;
+            add_char_to_string(string, ':');
+            break;
         case '{':
             tokenToMake->tokenType = openCurly;
             add_char_to_string(string, '{');
@@ -334,6 +337,14 @@ token* Operator(char input){
             add_char_to_string(string, '*');
             break;
         case '/':
+            if(nextChar == '/'){
+                skipLineComment();
+                return GetToken();
+            }
+            if(nextChar == '*'){
+                skipBlockComment();
+                return GetToken();
+            }
             tokenToMake->tokenType = ddiv;
             add_char_to_string(string, '/');
             break;
@@ -347,9 +358,27 @@ token* Operator(char input){
             break;
     }
     if(isValidOper(nextChar)){
-        tokenToMake->value = string;
+        token  * temp = makeToken(string, tokenToMake->tokenType);
         ungetc(nextChar, stdin);
-        return tokenToMake;
+        return temp;
     }
     exit(1);
+}
+
+token* makeToken(dynamic_string* string, enum tokenType type){
+    token * tokenToMake = malloc(sizeof (token));
+    if(!tokenToMake){
+        exit(99);
+    }
+    tokenToMake->value = string;
+    tokenToMake->tokenType = type;
+    return tokenToMake;
+}
+
+void free_token(token* token){
+    if(token->tokenType == 30)
+        return;
+    //printf("freeing token type = %s value = %s", tokenTypos[token->tokenType], token->value->string);
+    free_string(token->value);
+    free(token);
 }

@@ -14,7 +14,7 @@
 #include "dynamic_string.h"
 #include "basicScannerFunctions.h"
 
-enum tokenType {keyword, identificator, variable, sstring, type, integer, exponent, ffloat, add, sub, mul, ddiv, openBracket, closeBracket, openCurly, closeCurly, openSquare, closeSquare, equal, cmpEqual, notEquals, greater,lower, greaterEqual, lowerEqual, semicolumn, end, declare, prolog, comma};
+enum tokenType {keyword, identificator, variable, sstring, type, integer, exponent, ffloat, add, sub, mul, ddiv, openBracket, closeBracket, openCurly, closeCurly, openSquare, closeSquare, equal, cmpEqual, notEquals, greater,lower, greaterEqual, lowerEqual, semicolumn, end, declare, prolog, comma, colon, opperator};
 
 typedef struct{
     int tokenType;
@@ -33,4 +33,5 @@ token* Float(dynamic_string *string,char input);
 token* String();
 token* Operator(char input);
 token* makeToken(dynamic_string *string, enum tokenType type);
+void free_token(token* token);
 #endif //IFJ2022_SCANNER_H
