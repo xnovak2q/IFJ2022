@@ -28,7 +28,7 @@ void add_char_to_string(dynamic_string* string, char character)
 {
     if ((string->string_length + 1) >= (string->allocated_length))
     {
-        int new_size = string->string_length + 1;
+        int new_size = string->string_length + 8;
         string->string = (char*)realloc(string->string, new_size);
         if (!string->string)
         {
