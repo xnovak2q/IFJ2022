@@ -24,6 +24,7 @@ typedef struct {
 } DLTokenL;
 
 token* DLTokenL_FetchNext(DLTokenL *list);
+struct DLTokenLElement* DLTokenL_GetLastElement(DLTokenL *list);
 DLTokenL* DLTokenL_Create();
 void DLTokenL_Dispose(DLTokenL*);
 void DLTokenL_Clear(DLTokenL*);

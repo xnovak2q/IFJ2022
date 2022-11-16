@@ -136,6 +136,13 @@ token* DLTokenL_GetLast(DLTokenL *list) {
 	return list->lastElement->token;
 }
 
+struct DLTokenLElement* DLTokenL_GetLastElement(DLTokenL *list) {
+	if (list->lastElement == NULL)
+		exit(99);
+
+	return list->lastElement;
+}
+
 void DLTokenL_DeleteFirst(DLTokenL *list) {
 	if (list->firstElement == NULL)
 	{

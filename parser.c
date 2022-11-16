@@ -30,17 +30,20 @@ int runAnalysis(){
 
     while (strcmp(DLTokenL_GetLast(tokenList)->value->string, "konec"))
     {
-        DLTokenL_FetchNext(tokenList);
-        printf("Token #%i Type = %s Value = %s\n", i++, tokenTypos[DLTokenL_GetLast(tokenList)->tokenType],DLTokenL_GetLast(tokenList)->value->string);
 
-        if (DLTokenL_GetLast(tokenList)->tokenType == variable)
+        DLTokenL_FetchNext(tokenList);
+        if (DLTokenL_GetLastElement(tokenList)->previousElement->token->tokenType == variable && DLTokenL_GetLast(tokenList)->tokenType == equal)
         {
-            DLTokenL *tokenList = DLTokenL_CopyFromActive();
+            DLTokenL_FetchNext(tokenList);
+            DLTokenL_Last(tokenList);
             while (DLTokenL_GetLast(tokenList)->tokenType != semicolumn)
-            {
-            
-            }
-            
+                DLTokenL_FetchNext(tokenList);
+
+            DLTokenL *expressionList = DLTokenL_CopyFromActive(tokenList);
+            DLTokenL_DeleteLast(expressionList);
+            //precedencka(expressionList);
+            DLTokenL_Dispose(expressionList);
+            printf("vyraz zpracovan\n");
         }
         
 
