@@ -56,20 +56,25 @@ int runAnalysis(){
 }
 
 
-bool is_ifStatement(){
-    return DLTokenL_GetLast(tokenList)->tokenType == keyword && !strcmp(DLTokenL_GetLast(tokenList)->value->string, "if");
-}
-bool is_whileStatement(){
-    return DLTokenL_GetLast(tokenList)->tokenType == keyword && !strcmp(DLTokenL_GetLast(tokenList)->value->string, "while");
-}
-bool is_elseStatement(){
-    return DLTokenL_GetLast(tokenList)->tokenType == keyword && !strcmp(DLTokenL_GetLast(tokenList)->value->string, "else");
-}
-bool is_functionDefinitionHeader(){
-    return DLTokenL_GetLast(tokenList)->tokenType == keyword && !strcmp(DLTokenL_GetLast(tokenList)->value->string, "function");
-}
-bool is_compoundStatement(){
-    return DLTokenL_GetLast(tokenList)->tokenType == openCurly;
+bool is_ifStatement()               { return DLTokenL_GetLast(tokenList)->tokenType == iff       ;}
+bool is_whileStatement()            { return DLTokenL_GetLast(tokenList)->tokenType == wwhile    ;}
+bool is_elseStatement()             { return DLTokenL_GetLast(tokenList)->tokenType == eelse     ;}
+bool is_functionDefinitionHeader()  { return DLTokenL_GetLast(tokenList)->tokenType == ffunction ;}
+bool is_compoundStatement()         { return DLTokenL_GetLast(tokenList)->tokenType == openCurly ;}
+bool token_is_type(token* token){
+    switch (token->tokenType){
+        case typeInt:
+        case typeString:
+        case typeFloat:
+        case typeVoid:
+        case nullableInt:
+        case nullableString:
+        case nullableFloat:
+        case nullableVoid:
+            return true;    
+        default:
+            return false;
+    }
 }
 
 void whileStatement(){
@@ -159,10 +164,10 @@ bool inFunctionDefinition = false;
 
 void functionDefinition(){
     if (!is_functionDefinitionHeader()) exit(2);
-
+    if(inFunctionDefinition) exit(2);
+    
     printf("\x1B[36min function definition\033[0m\n");
 
-    if(inFunctionDefinition) exit(2);
     inFunctionDefinition = true;
 
     DLTokenL_FetchNext(tokenList);
@@ -171,13 +176,13 @@ void functionDefinition(){
     
     while (DLTokenL_GetLast(tokenList)->tokenType != closeBracket)
     {
-        if (DLTokenL_FetchNext(tokenList)->tokenType != type) exit(2);
+        if (!token_is_type(DLTokenL_FetchNext(tokenList)))        exit(2);
         if (DLTokenL_FetchNext(tokenList)->tokenType != variable) exit(2);
         //TODO zaznamenat promennou a datatyp do noveho LF
         if (DLTokenL_FetchNext(tokenList)->tokenType != comma && DLTokenL_GetLast(tokenList)->tokenType != closeBracket) exit(2);
     }
     
-    if (DLTokenL_FetchNext(tokenList)->tokenType != colon || DLTokenL_FetchNext(tokenList)->tokenType != type) exit(2);
+    if (DLTokenL_FetchNext(tokenList)->tokenType != colon || !token_is_type(DLTokenL_FetchNext(tokenList))) exit(2);
     //TODO zaznamenat jmeno a datatyp funkce
 
     DLTokenL_FetchNext(tokenList);
