@@ -28,7 +28,6 @@ int runAnalysis(){
     } */
 
 
-
     while (DLTokenL_GetLast(tokenList)->tokenType != end)
     {
 
@@ -165,7 +164,7 @@ bool inFunctionDefinition = false;
 void functionDefinition(){
     if (!is_functionDefinitionHeader()) exit(2);
     if(inFunctionDefinition) exit(2);
-    
+
     printf("\x1B[36min function definition\033[0m\n");
 
     inFunctionDefinition = true;

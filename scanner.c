@@ -455,3 +455,12 @@ void free_token(token* token){
     free_string(token->value);
     free(token);
 }
+
+void UnGetToken(token* token){
+    ungetc(' ', stdin);
+    for(size_t i = token->value->string_length; i > 0; i--){
+        ungetc(token->value->string[i-1], stdin);
+    }
+    ungetc(' ', stdin);
+    free_token(token);
+}

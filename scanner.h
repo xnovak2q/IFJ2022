@@ -79,4 +79,5 @@ token* String();
 token* Operator(char input);
 token* makeToken(dynamic_string *string, enum tokenType type);
 void free_token(token* token);
+void UnGetToken(token* token);
 #endif //IFJ2022_SCANNER_H

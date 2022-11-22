@@ -6,6 +6,11 @@ token* DLTokenL_FetchNext(DLTokenL *list){
 	return DLTokenL_GetLast(list);
 }
 
+void DLTokenL_UnFetchNext(DLTokenL *list){
+	UnGetToken(DLTokenL_GetLast(list));
+	DLTokenL_DeleteLast(list);
+}
+
 DLTokenL* DLTokenL_CopyFromActive(DLTokenL *copiedList){
 	if (!DLTokenL_IsActive)
 	{
@@ -173,26 +178,17 @@ void DLTokenL_DeleteFirst(DLTokenL *list) {
 
 void DLTokenL_DeleteLast(DLTokenL *list) {
 	if (list->lastElement == NULL)
-	{
 		return;
-	} 
 	
 	if (list->lastElement == list->activeElement)
-	{
 		list->activeElement = NULL;
-	}
 
-	
 	if (list->firstElement == list->lastElement)
-	{
 		list->firstElement = NULL;
-	}
 
 	DLTokenLElementPtr newTail = list->lastElement->previousElement;
 	if (newTail != NULL)
-	{
 		newTail->nextElement = NULL;
-	}
 	
 	free(list->lastElement);
 	list->lastElement = newTail;
