@@ -1,6 +1,50 @@
 #include "scanner.h"
 
-char* tokenTypos[] = {"keyword", "identificator", "variable", "sstring", "type", "integer", "exponent", "ffloat", "add", "sub", "mul", "ddiv", "openBracket", "closeBracket", "openCurly", "closeCurly", "openSquare", "closeSquare", "equal", "cmpEqual", "notEquals", "greater", "lower", "greaterEqual", "lowerEqual", "semicolumn", "end", "declare", "prolog", "comma", "colon"};
+char* tokenTypos[] = {
+    "iff",
+    "eelse",
+    "ffunction",
+    "nnull",
+    "rreturn",
+    "wwhile", 
+    "identificator", 
+    "variable", 
+    "sstring", 
+    "typeInt", 
+    "typeString", 
+    "typeFloat", 
+    "typeVoid",
+    "nullableInt", 
+    "nullableString",
+    "nullableFloat",
+    "nullableVoid",
+    "integer", 
+    "exponent", 
+    "ffloat", 
+    "add", 
+    "sub", 
+    "mul", 
+    "ddiv", 
+    "openBracket", 
+    "closeBracket", 
+    "openCurly", 
+    "closeCurly", 
+    "openSquare", 
+    "closeSquare", 
+    "equal", 
+    "cmpEqual", 
+    "notEquals", 
+    "greater", 
+    "lower", 
+    "greaterEqual", 
+    "lowerEqual", 
+    "semicolumn", 
+    "end", 
+    "declare", 
+    "prolog", 
+    "comma", 
+    "colon"
+};
 
 token* GetToken() {
     char input = getchar();
@@ -93,14 +137,29 @@ token* Type(char input){
         add_char_to_string(string, input);
         input = getchar();
     }
-    if(!isType(*string)){
-        exit(1);
-    }
+
     if(!isValidText(input)){
         exit(1);
     }
     ungetc(input, stdin);
-    return makeToken(string, type);
+
+    switch(isType(*string)){
+        case 0: return makeToken(string, typeFloat);
+        case 1: return makeToken(string, typeInt);
+        case 2: return makeToken(string, typeString);
+        case 3: return makeToken(string, typeVoid);
+        default: break;
+    }
+
+    switch(isNullableType(*string)){
+        case 0: return makeToken(string, nullableFloat);
+        case 1: return makeToken(string, nullableInt);
+        case 2: return makeToken(string, nullableString);
+        case 3: return makeToken(string, nullableVoid);
+        default: break;
+    }
+
+    exit(1);
 }
 
 token* Word(char input){
@@ -119,12 +178,25 @@ token* Word(char input){
     if(!isValidText(input)){
         exit(1);
     }
-    if(isKeyword(*string)){
-        return makeToken(string, keyword);
+
+    switch(isKeyword(*string)){
+        case 0: return makeToken(string, eelse);
+        case 1: return makeToken(string, ffunction);
+        case 2: return makeToken(string, iff);
+        case 3: return makeToken(string, nnull);
+        case 4: return makeToken(string, rreturn);
+        case 5: return makeToken(string, wwhile);
+        default: break;
     }
-    if(isType(*string)){
-        return makeToken(string,type);
+
+    switch(isType(*string)){
+        case 0: return makeToken(string, typeFloat);
+        case 1: return makeToken(string, typeInt);
+        case 2: return makeToken(string, typeString);
+        case 3: return makeToken(string, typeVoid);
+        default: break;
     }
+
     ungetc(input, stdin);
     return makeToken(string, identificator);
 }
