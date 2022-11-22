@@ -175,10 +175,12 @@ token* Word(char input){
         ungetc(input, stdin);
         return Declare(string);
     }
+    
     if(!isValidText(input)){
         exit(1);
     }
 
+    ungetc(input, stdin);
     switch(isKeyword(*string)){
         case 0: return makeToken(string, eelse);
         case 1: return makeToken(string, ffunction);
@@ -197,7 +199,6 @@ token* Word(char input){
         default: break;
     }
 
-    ungetc(input, stdin);
     return makeToken(string, identificator);
 }
 
