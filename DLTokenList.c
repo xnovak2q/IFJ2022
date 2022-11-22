@@ -2,6 +2,7 @@
 
 token* DLTokenL_FetchNext(DLTokenL *list){
 	DLTokenL_InsertLast(list, GetToken());
+    printf("Token: type = %s, value = %s\n", tokenTypos[DLTokenL_GetLast(list)->tokenType],DLTokenL_GetLast(list)->value->string);
 	return DLTokenL_GetLast(list);
 }
 
@@ -36,7 +37,7 @@ void DLTokenLElement_Dispose(struct DLTokenLElement* element){
 	free(element);
 }
 
-void DLTokenL_Dispose(DLTokenL *list ) {
+void DLTokenL_Dispose(DLTokenL *list) {
 	DLTokenLElementPtr currElement = list->firstElement;
 	DLTokenLElementPtr prevElement;
 	while (currElement)
@@ -50,7 +51,7 @@ void DLTokenL_Dispose(DLTokenL *list ) {
 	free(list);
 }
 
-void DLTokenL_Clear(DLTokenL *list ) {
+void DLTokenL_Clear(DLTokenL *list) {
 	DLTokenLElementPtr currElement = list->firstElement;
 	DLTokenLElementPtr prevElement;
 	while (currElement)

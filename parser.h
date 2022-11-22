@@ -16,6 +16,17 @@ typedef struct{
     dynamic_string* value;
 } var;
 
+bool is_ifStatement();
+bool is_whileStatement();
+bool is_elseStatement();
+bool is_functionDefinitionHeader();
+bool is_compoundStatement();
+void ifStatement();
+void whileStatement();
+void elseStatement();
+void compoundStatement();
+void functionDefinition();
+void statement();
 
 
 #endif //IFJ2022_PARSER_H

@@ -22,6 +22,7 @@ void free_string(dynamic_string* string)
         string->allocated_length = 0;
         string->string_length = 0;
     }
+    free(string);
 }
 
 void add_char_to_string(dynamic_string* string, char character)
