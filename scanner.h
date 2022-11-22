@@ -14,7 +14,52 @@
 #include "dynamic_string.h"
 #include "basicScannerFunctions.h"
 
-enum tokenType {keyword, identificator, variable, sstring, type, integer, exponent, ffloat, add, sub, mul, ddiv, openBracket, closeBracket, openCurly, closeCurly, openSquare, closeSquare, equal, cmpEqual, notEquals, greater,lower, greaterEqual, lowerEqual, semicolumn, end, declare, prolog, comma, colon, opperator};
+enum tokenType {
+    iff,
+    eelse,
+    ffunction,
+    nnull,
+    rreturn,
+    wwhile,
+    identificator, 
+    variable,
+    sstring,
+    typeInt,
+    typeString,
+    typeFloat,
+    typeVoid,
+    nullableInt,
+    nullableString,
+    nullableFloat,
+    nullableVoid,
+    integer,
+    exponent,
+    ffloat,
+    add,
+    sub,
+    mul,
+    ddiv,
+    openBracket,
+    closeBracket,
+    openCurly,
+    closeCurly,
+    openSquare,
+    closeSquare,
+    equal,
+    cmpEqual,
+    notEquals,
+    greater,
+    lower,
+    greaterEqual,
+    lowerEqual,
+    semicolumn,
+    end,
+    declare,
+    prolog,
+    comma,
+    colon,
+    opperator
+};
 
 typedef struct{
     int tokenType;

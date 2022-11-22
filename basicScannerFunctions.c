@@ -12,6 +12,10 @@ const char *types[] = {
         "float", "int", "string", "void"
 };
 
+const char *nullableTypes[] = {
+        "?float", "?int", "?string", "?void"
+};
+
 bool isLetterUnder(char x){
     return isalpha(x) || x == '_';
 }
@@ -106,20 +110,28 @@ bool isQuestion(char x){
     return x == '?';
 }
 
-bool isType(dynamic_string x){
+int isType(dynamic_string x){
     for(int i = 0; i < 4; i++){
         if(!strcmp(x.string, types[i]))
-            return true;
+            return i;
     }
-    return false;
+    return -1;
 }
 
-bool isKeyword(dynamic_string x){
-    for(int i = 0; i <= 5; i++){
-        if(!strcmp(x.string, keywords[i]))
-            return true;
+int isNullableType(dynamic_string x){
+    for(int i = 0; i < 4; i++){
+        if(!strcmp(x.string, nullableTypes[i]))
+            return i;
     }
-    return false;
+    return -1;
+}
+
+int isKeyword(dynamic_string x){
+    for(int i = 0; i < 6; i++){
+        if(!strcmp(x.string, keywords[i]))
+            return i;
+    }
+    return -1;
 }
 
 bool isDollar(char x){
