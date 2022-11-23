@@ -21,7 +21,7 @@ typedef enum {
 //types for stack
 typedef enum {
     EOS,        // end of stack $
-    START,      // start of expression
+    STOP,      // start of expression
     TERM,       // terminal
     NON_TERM    // non-terminal
 }stack_item_type;
@@ -33,6 +33,6 @@ typedef struct
     stack_item_type type;
 }stack_item;
 
-void expression()
+void expression();
 
 #endif
