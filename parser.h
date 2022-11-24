@@ -6,6 +6,7 @@
 #include <stdio.h>
 
 #include "scanner.c"
+#include "DLTokenList.c"
 #include "dynamic_string.h"
 #include "basicScannerFunctions.h"
 
@@ -27,6 +28,10 @@ void elseStatement();
 void compoundStatement();
 void functionDefinition();
 void statement();
+bool token_is_expressionMember(token* token);
+DLTokenL* consumeExpression();
+bool is_variableDefinition();
+void variableDefinition();
 
 
 #endif //IFJ2022_PARSER_H
