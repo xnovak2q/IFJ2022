@@ -69,18 +69,17 @@ bool is_variableDefinition(){
 bool is_lineStatement(){
     int fetchedTokensCount = 0;
     while (
-        DLTokenL_GetLast(tokenList)->tokenType != semicolumn &&
+        DLTokenL_GetLast(tokenList)->tokenType != semicolumn  &&
         DLTokenL_GetLast(tokenList)->tokenType != end &&
-        DLTokenL_GetLast(tokenList)->tokenType != variable &&
         !is_ifStatement() && !is_whileStatement() && !is_elseStatement() && !is_functionDefinitionHeader && !is_compoundStatement && !is_variableDefinition
-        )
+       ) 
     {
         fetchedTokensCount++;
         DLTokenL_FetchNext(tokenList);
     }
-    printf("tady: %s\n", tokenTypos[DLTokenL_GetLast(tokenList)->tokenType]);
 
-    bool isLineStatement = DLTokenL_GetLast(tokenList)->tokenType == semicolumn;
+    DLTokenL_FetchNext(tokenList);
+    bool isLineStatement = DLTokenL_GetLast(tokenList)->tokenType == semicolumn || (DLTokenL_GetLast(tokenList)->tokenType == end && DLTokenL_GetLastElement(tokenList)->previousElement->token->tokenType == semicolumn);
 
     for (size_t i = 0; i < fetchedTokensCount; i++)
         DLTokenL_UnFetchNext(tokenList);
@@ -255,7 +254,8 @@ void variableDefinition(){
     printf("\x1B[36min variable definition\033[0m\n");
 
     dynamic_string* variableName = DLTokenL_GetLast(tokenList)->value;
-
+    DLTokenL_FetchNext(tokenList);
+    DLTokenL_FetchNext(tokenList);
     if (!is_lineStatement(tokenList))
         exit(2);
 
