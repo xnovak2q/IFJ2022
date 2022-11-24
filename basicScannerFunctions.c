@@ -65,6 +65,7 @@ bool isOperator(char x){
         case ';':
         case '!':
         case ':':
+        case '.':
             return true;
         default:
             return isMinusPlus(x) || isEqual(x) || isSlash(x) || isQuestion(x);

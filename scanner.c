@@ -38,11 +38,12 @@ char* tokenTypos[] = {
     "lower", 
     "greaterEqual", 
     "lowerEqual", 
-    "semicolumn", 
-    "end", 
-    "declare", 
-    "prolog", 
-    "comma", 
+    "semicolumn",
+    "concat",
+    "end",
+    "declare",
+    "prolog",
+    "comma",
     "colon"
 };
 
@@ -175,7 +176,7 @@ token* Word(char input){
         ungetc(input, stdin);
         return Declare(string);
     }
-    
+
     if(!isValidText(input)){
         exit(1);
     }
@@ -428,6 +429,10 @@ token* Operator(char input){
         case ';':
             tokenToMake->tokenType = semicolumn;
             add_char_to_string(string, ';');
+            break;
+        case '.':
+            tokenToMake->tokenType = concat;
+            add_char_to_string(string, '.');
             break;
     }
     if(isValidOper(nextChar)){

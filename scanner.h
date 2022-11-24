@@ -53,6 +53,7 @@ enum tokenType {
     greaterEqual,
     lowerEqual,
     semicolumn,
+    concat,
     end,
     declare,
     prolog,
