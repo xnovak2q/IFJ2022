@@ -3,28 +3,25 @@
 DLTokenL *tokenList;
 
 int runAnalysis(){
-    int i = 1;
-
     tokenList = DLTokenL_Create();
 
     DLTokenL_FetchNext(tokenList);
-
-     /*if (DLTokenL_GetLast(tokenList)->tokenType != prolog)
+    if (DLTokenL_GetLast(tokenList)->tokenType != prolog)
     {
-       DLTokenL_Dispose(tokenList); return 2;
+       DLTokenL_Dispose(tokenList); exit(2);
     }
 
     DLTokenL_FetchNext(tokenList);
-    if (DLTokenL_GetLast(tokenList)->tokenType != declare)
+    /*if (DLTokenL_GetLast(tokenList)->tokenType != declare)
     {
-        DLTokenL_Dispose(tokenList); return 2;
-    }
+        DLTokenL_Dispose(tokenList); exit(2);
+    } 
 
     DLTokenL_FetchNext(tokenList);
     if (DLTokenL_GetLast(tokenList)->tokenType != semicolumn)
     {
-        DLTokenL_Dispose(tokenList); return 2;
-    } */
+        DLTokenL_Dispose(tokenList); exit(2);
+    }*/
 
 
     while (DLTokenL_GetLast(tokenList)->tokenType != end)
@@ -33,20 +30,6 @@ int runAnalysis(){
             functionDefinition();
         else statement();
         DLTokenL_FetchNext(tokenList);
-        /* if (DLTokenL_GetLastElement(tokenList)->previousElement->token->tokenType == variable && DLTokenL_GetLast(tokenList)->tokenType == equal)
-        {
-            DLTokenL_FetchNext(tokenList);
-            DLTokenL_Last(tokenList);
-            while (DLTokenL_GetLast(tokenList)->tokenType != semicolumn)
-                DLTokenL_FetchNext(tokenList);
-
-            DLTokenL *expressionList = DLTokenL_CopyFromActive(tokenList);
-            DLTokenL_DeleteLast(expressionList);
-            //precedencka(expressionList);
-            DLTokenL_Dispose(expressionList);
-            printf("vyraz zpracovan\n");
-        } */
-
     }
 
 
@@ -68,11 +51,8 @@ bool is_variableDefinition(){
 }
 bool is_lineStatement(){
     int fetchedTokensCount = 0;
-    while (
-        DLTokenL_GetLast(tokenList)->tokenType != semicolumn  &&
-        DLTokenL_GetLast(tokenList)->tokenType != end &&
-        !is_ifStatement() && !is_whileStatement() && !is_elseStatement() && !is_functionDefinitionHeader && !is_compoundStatement && !is_variableDefinition
-       ) 
+
+    while (token_is_expressionMember(DLTokenL_GetLast(tokenList)) || is_functionCall())
     {
         fetchedTokensCount++;
         DLTokenL_FetchNext(tokenList);
@@ -85,6 +65,11 @@ bool is_lineStatement(){
         DLTokenL_UnFetchNext(tokenList);
      
     return isLineStatement;
+}
+bool is_functionCall(){
+    bool isFunctionCall = DLTokenL_GetLast(tokenList)->tokenType == identificator && DLTokenL_FetchNext(tokenList)->tokenType == openBracket;
+    DLTokenL_UnFetchNext(tokenList);
+    return isFunctionCall;
 }
 bool token_is_type(token* token){
     switch (token->tokenType){
@@ -125,6 +110,26 @@ bool token_is_expressionMember(token* token){
         default:
             return false;
     }
+}
+
+void functionCall(){
+    printf("\x1B[36min function call\033[0m\n");
+
+    DLTokenL_FetchNext(tokenList); //(
+
+    while (DLTokenL_FetchNext(tokenList)->tokenType != closeBracket)
+    {
+        if (DLTokenL_GetLast(tokenList)->tokenType != variable)
+            exit(2);
+
+        //TODO parametr n
+
+        if (DLTokenL_FetchNext(tokenList)->tokenType != comma)
+            exit(2);
+    }
+    
+    
+    printf("\x1B[35mout of function call\033[0m\n");
 }
 
 void whileStatement(){
@@ -207,7 +212,15 @@ void functionDefinition(){
 }
 
 void lineStatement(){
+    printf("\x1B[36min line-statement\033[0m\n");
 
+    if (is_functionCall())
+        functionCall();
+
+    DLTokenL_FetchNext(tokenList);
+
+    printf("\x1B[35mout of line-statement\033[0m\n");
+    
 }
 
 void statement(){
@@ -229,6 +242,7 @@ void statement(){
 }
 
 DLTokenL* consumeExpression(){
+    printf("\x1B[36min expression\033[0m\n");
     DLTokenL_Last(tokenList);
 
     int roundBracketCount = 0;
@@ -247,27 +261,28 @@ DLTokenL* consumeExpression(){
     DLTokenL_UnFetchNext(tokenList);
     DLTokenL* returnedList = DLTokenL_CopyFromActive(tokenList);
     DLTokenL_FetchNext(tokenList); //pro udrzeni konvence, ze kazda dalsi funkce se jiz nachazi na zacatku sve odpovidajici sekvence
+    printf("\x1B[35mout of expression\033[0m\n");
     return returnedList;
 }
 
 void variableDefinition(){
     printf("\x1B[36min variable definition\033[0m\n");
 
-    dynamic_string* variableName = DLTokenL_GetLast(tokenList)->value;
+    //dynamic_string* variableName = DLTokenL_GetLast(tokenList)->value;
     DLTokenL_FetchNext(tokenList);
     DLTokenL_FetchNext(tokenList);
+
     if (!is_lineStatement(tokenList))
         exit(2);
 
     DLTokenL* expressionList = consumeExpression();
-    //TODO expression = precedencka(expressionList);
-    //TODO generovaniPromenne(variableName, expression);
+    //TODO binary_tree* expressionTree = precedencka(expressionList);
+    //TODO generator_variableDeclaration(variableName, , expressionTree);
     DLTokenL_Dispose(expressionList);
 
+    printf("%s\n", tokenTypos[DLTokenL_GetLast(tokenList)->tokenType]);
     if (DLTokenL_GetLast(tokenList)->tokenType != semicolumn)
         exit(2);
-
-    DLTokenL_FetchNext(tokenList);
 
     printf("\x1B[35mout of variable definition\033[0m\n");
 }

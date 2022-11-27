@@ -2,17 +2,18 @@
 
 token* DLTokenL_FetchNext(DLTokenL *list){
 	DLTokenL_InsertLast(list, GetToken());
-    printf("Token: type = %s, value = %s\n", tokenTypos[DLTokenL_GetLast(list)->tokenType],DLTokenL_GetLast(list)->value->string);
+    printf("Fetch token: %s (%s)\n",DLTokenL_GetLast(list)->value->string, tokenTypos[DLTokenL_GetLast(list)->tokenType]);
 	return DLTokenL_GetLast(list);
 }
 
 void DLTokenL_UnFetchNext(DLTokenL *list){
+	printf("UnFetch token: %s (%s)\n",DLTokenL_GetLast(list)->value->string, tokenTypos[DLTokenL_GetLast(list)->tokenType]);
 	UnGetToken(DLTokenL_GetLast(list));
 	DLTokenL_DeleteLast(list);
 }
 
 DLTokenL* DLTokenL_CopyFromActive(DLTokenL *copiedList){
-	if (!DLTokenL_IsActive)
+	if (!DLTokenL_IsActive(copiedList))
 	{
 		DLTokenL_Dispose(copiedList); exit(99);
 	}

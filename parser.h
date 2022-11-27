@@ -32,6 +32,8 @@ bool token_is_expressionMember(token* token);
 DLTokenL* consumeExpression();
 bool is_variableDefinition();
 void variableDefinition();
+bool is_functionCall();
+void functionCall();
 
 
 #endif //IFJ2022_PARSER_H
