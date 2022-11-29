@@ -4,27 +4,32 @@
 #include <stdbool.h>
 #include "expression.h"
 
-#define STACK_SIZE 101
+typedef enum
+{
+    EOS,
+    START,
+    TERM,
+    NONTERM
+}item_type;
+
 
 //stack for precedence analysis
 typedef struct stack_item
 {
-    //type for semantic
-    stack_item_type stack_type;
-    struct stack_item *next;
-}prec_stack_item;
+    token* token;
+    item_type stack_type;
+    struct stackitem *next;
+}Stack_item_t;
 
-typedef struct 
+typedef struct stack
 {
-    prec_stack_item *top;
-}prec_stack_t;
+    Stack_item_t *top;
+}Stack_t;
 
-void stack_initialize(prec_stack_t* stack);
+void stack_initialize(Stack_t* stack);
 
-bool stack_push(prec_stack_t* stack, stack_item_type type);
+bool stack_push(Stack_t* stack, item_type type, token* token);
 
-bool stack_pop(prec_stack_t* stack);
-
-
+bool stack_pop(Stack_t* stack);
 
 #endif

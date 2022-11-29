@@ -2,26 +2,29 @@
 #define PRECEDENCE_H
 
 #include <stdbool.h>
-#include <dynamic_string.h>
-#include <scanner.h>
+#include "dynamic_string.h"
+#include "scanner.h"
+#include "stack.h"
+#include "DLTokenList.h"
 
 #define TABLE_SIZE 7
 
 //precedence table indexes
 typedef enum {
-    PLUS_MINUS, // +-
-    MUL_DIV,    // */
-    L_BRACKET,  // (
-    R_BRACKET,  // )
-    LOGIC,      // <, > etc.
-    OPERAND,    // i
-    DOLLAR      // $
+    PLUS_MINUS, //0 +-
+    DOT,        //1 .
+    MUL_DIV,    //2 */
+    L_BRACKET,  //3 (
+    R_BRACKET,  //4 )
+    LOGIC,      //5 <, > etc.
+    OPERAND,    //6 i
+    DOLLAR      //7 $
 } prec_table_index;
 
 //types for stack
 typedef enum {
     EOS,        // end of stack $
-    STOP,      // start of expression
+    STOP,       // start of expression
     TERM,       // terminal
     NON_TERM    // non-terminal
 }stack_item_type;
