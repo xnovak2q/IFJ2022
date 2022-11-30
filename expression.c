@@ -1,58 +1,43 @@
 #include "expression.h"
 
-char prec_table[TABLE_SIZE][TABLE_SIZE] =
-{  //current token
-//       +-  | */  |  (  |  )  |  r  |  i  |  $  |
-       { '>' , '<' , '<' , '>' , '>' , '<' , '>' }, // | +-  // On top of stack
-       { '>' , '>' , '<' , '>' , '>' , '<' , '>' }, // | */
-       { '<' , '<' , '<' , '=' , '<' , '<' , 'B' }, // | (
-       { '>' , '>' , 'B' , '>' , '>' , 'B' , '>' }, // | )
-       { '<' , '<' , '<' , '>' , 'B' , '<' , '>' }, // | r
-       { '>' , '>' , 'B' , '>' , '>' , 'B' , '>' }, // | i
-       { '<' , '<' , '<' , 'B' , '<' , '<' , 'D' }  // | $
+prec_table_index prec_table[TABLE_SIZE][TABLE_SIZE] = {
+//          */  +-.   <    >   <=    >=  ===  !==   (    )   var   $
+/*  *  */ { P,   P,   P,   P,   P,   P,   P,   P,   R,   P,   R,   P},   
+/* +-. */ { R,   P,   P,   P,   P,   P,   P,   P,   R,   P,   R,   P},         
+/*  <  */ { R,   R,   P,   E,   E,   E,   P,   P,   R,   P,   R,   P},   
+/*  >  */ { R,   R,   E,   P,   E,   E,   P,   P,   R,   P,   R,   P},   
+/* <=  */ { R,   R,   E,   E,   P,   E,   P,   P,   R,   P,   R,   P},   
+/* >=  */ { R,   R,   E,   E,   E,   P,   P,   P,   R,   P,   R,   P},   
+/* === */ { R,   R,   R,   R,   R,   R,   P,   E,   R,   P,   R,   P},   
+/* !== */ { R,   R,   R,   R,   R,   R,   E,   P,   R,   P,   R,   P},   
+/*  (  */ { R,   R,   R,   R,   R,   R,   R,   R,   R,   S,   R,   P},   
+/*  )  */ { P,   P,   P,   P,   P,   P,   P,   P,   E,   P,   E,   P},   
+/* var */ { P,   P,   P,   P,   P,   P,   P,   P,   E,   P,   E,   P},   
+/*  $  */ { R,   R,   R,   R,   R,   R,   R,   R,   R,   R,   R,   D},   
 };
 
 prec_table_index type_to_symbol(token* token){
-    switch (token->tokenType)
-    {
-    case add:
-        return;
-    
-    default:
-        break;
-    }
+    // ziskani informace o jake pravidlo se bude jednat podle tabulky
 }
 
+
+
 void precedence(DLTokenL* token_list){
-    prec_stack_t stack;
+    Stack_t stack;
     stack_initialize(&stack);
 
-    prec_stack_item* top;
-    prec_table_index table_index;
-    
-    stack_push(&stack, DOLLAR);
+    token eos; //$ na spodu zasobniku
+    if (stack_push(&stack, EOS, &eos, true)) exit(99);
 
-    bool work = true;
+    // nacist token
 
-    while (work)
-    {
+    // check na spravnost typu tokenu -> jinak exit (stack_free)
 
-    }
+    // pokud je token float, string, int nebo identifikator -> push VARIABLE a stop true
+    //                                                      -> jinak NOT_VARIABLE a stop false
 
+    //  while podminka konec listu
+        //  nacist dalsi token
+        //  check na spravnost typu tokenu -> jinak exit (stack_free)
     return;
 };
-
-// //             {x}      {/}     {+}     {-}     {.}     {<}     {>}    {<=}     {>=}   {===}   {!==}   {(}       {)}    {int}   float}  {string} {var_id}    {$}
-// /*  {x}  */ { REDUCE, REDUCE, REDUCE, REDUCE, REDUCE, REDUCE, REDUCE, REDUCE, REDUCE, REDUCE, REDUCE, PUSH   , REDUCE, PUSH   , PUSH   , PUSH   , PUSH   , REDUCE },
-// /*  {/}  */ { REDUCE, REDUCE, REDUCE, REDUCE, REDUCE, REDUCE, REDUCE, REDUCE, REDUCE, REDUCE, REDUCE, PUSH   , REDUCE, PUSH   , PUSH   , PUSH   , PUSH   , REDUCE },
-// /*  {+}  */ { PUSH  , PUSH  , REDUCE, REDUCE, REDUCE, REDUCE, REDUCE, REDUCE, REDUCE, REDUCE, REDUCE, PUSH   , REDUCE, PUSH   , PUSH   , PUSH   , PUSH   , REDUCE },
-// /*  {-}  */ { PUSH  , PUSH  , REDUCE, REDUCE, REDUCE, REDUCE, REDUCE, REDUCE, REDUCE, REDUCE, REDUCE, PUSH   , REDUCE, PUSH   , PUSH   , PUSH   , PUSH   , REDUCE },
-// /*  {.}  */ { PUSH  , PUSH  , REDUCE, REDUCE, REDUCE, REDUCE, REDUCE, REDUCE, REDUCE, REDUCE, REDUCE, PUSH   , REDUCE, PUSH   , PUSH   , PUSH   , PUSH   , REDUCE },
-// /*  {<}  */ { PUSH  , PUSH  , PUSH  , PUSH  , PUSH  , REDUCE, REDUCE, REDUCE, REDUCE, REDUCE, REDUCE, PUSH   , REDUCE, PUSH   , PUSH   , PUSH   , PUSH   , REDUCE },
-// /*  {>}  */ { PUSH  , PUSH  , PUSH  , PUSH  , PUSH  , REDUCE, REDUCE, REDUCE, REDUCE, REDUCE, REDUCE, PUSH   , REDUCE, PUSH   , PUSH   , PUSH   , PUSH   , REDUCE },
-// /* {<=}  */ { PUSH  , PUSH  , PUSH  , PUSH  , PUSH  , REDUCE, REDUCE, REDUCE, REDUCE, REDUCE, REDUCE, PUSH   , REDUCE, PUSH   , PUSH   , PUSH   , PUSH   , REDUCE },
-// /* {>=}  */ { PUSH  , PUSH  , PUSH  , PUSH  , PUSH  , REDUCE, REDUCE, REDUCE, REDUCE, REDUCE, REDUCE, PUSH   , REDUCE, PUSH   , PUSH   , PUSH   , PUSH   , REDUCE },
-// /* {===} */ { PUSH  , PUSH  , PUSH  , PUSH  , PUSH  , PUSH  , PUSH  , PUSH  , PUSH  , REDUCE, REDUCE, PUSH   , REDUCE, PUSH   , PUSH   , PUSH   , PUSH   , REDUCE },
-// /* {!==} */ { PUSH  , PUSH  , PUSH  , PUSH  , PUSH  , PUSH  , PUSH  , PUSH  , PUSH  , REDUCE, REDUCE, PUSH   , REDUCE, PUSH   , PUSH   , PUSH   , PUSH   , REDUCE },
-// /*  {(}  */ { PUSH  , PUSH  , PUSH  , PUSH  , PUSH  , PUSH  , PUSH  , PUSH  , PUSH  , PUSH  , PUSH  , PUSH   , EQUAL , PUSH   , PUSH   , PUSH   , PUSH   , ERROR  },
-// /*  {$}  */ { PUSH  , PUSH  , PUSH  , PUSH  , PUSH  , PUSH  , PUSH  , PUSH  , PUSH  , PUSH  , PUSH  , PUSH   , ERROR , PUSH   , PUSH   , PUSH   , PUSH   , ERROR  },
