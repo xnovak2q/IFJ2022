@@ -366,6 +366,10 @@ token* Operator(char input){
             if(!isEqual(nextChar)){
                 exit(1);
             }
+            nextChar = getchar();
+            if(!isValidOper(nextChar)){
+                exit(1);
+            }
             add_str_to_string(string, "!==");
             temp = makeToken(string, notEquals);
             ungetc(nextChar, stdin);
