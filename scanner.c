@@ -38,11 +38,11 @@ char* tokenTypos[] = {
     "lower", 
     "greaterEqual", 
     "lowerEqual", 
-    "semicolumn", 
-    "end", 
-    "declare", 
-    "prolog", 
-    "comma", 
+    "semicolumn",
+    "end",
+    "declare",
+    "prolog",
+    "comma",
     "colon"
 };
 
@@ -458,11 +458,17 @@ void free_token(token* token){
 
 void UnGetToken(token* token){
     ungetc(' ', stdin);
+    
+    if (token->tokenType == sstring)
+        ungetc('"', stdin);
+
     for(size_t i = token->value->string_length; i > 0; i--)
         ungetc(token->value->string[i-1], stdin);
         
     if (token->tokenType == variable)
         ungetc('$', stdin);
+    else if (token->tokenType == sstring)
+        ungetc('"', stdin);
     
     ungetc(' ', stdin);
     free_token(token);

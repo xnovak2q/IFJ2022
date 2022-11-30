@@ -17,6 +17,10 @@ typedef struct{
     dynamic_string* value;
 } var;
 
+DLTokenL *tokenList;
+int programDepth;
+
+
 bool is_ifStatement();
 bool is_whileStatement();
 bool is_elseStatement();
@@ -29,7 +33,7 @@ void compoundStatement();
 void functionDefinition();
 void statement();
 bool token_is_expressionMember(token* token);
-DLTokenL* consumeExpression();
+DLTokenL* consumeExpression(bool canBeEmpty, int startingRoundBracketCount);
 bool is_variableDefinition();
 void variableDefinition();
 bool is_functionCall();

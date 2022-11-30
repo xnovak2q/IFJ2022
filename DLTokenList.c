@@ -1,13 +1,17 @@
 #include "DLTokenList.h"
 
 token* DLTokenL_FetchNext(DLTokenL *list){
-	DLTokenL_InsertLast(list, GetToken());
-    printf("Fetch token: %s (%s)\n",DLTokenL_GetLast(list)->value->string, tokenTypos[DLTokenL_GetLast(list)->tokenType]);
+	if (list->lastElement != NULL && DLTokenL_GetLast(list)->tokenType == end)
+		DLTokenL_InsertLast(list, makeToken(NULL, end));
+	else
+		DLTokenL_InsertLast(list, GetToken());
+
+    //printf("Fetch token: %s (%s)\n",DLTokenL_GetLast(list)->value->string, tokenTypos[DLTokenL_GetLast(list)->tokenType]);
 	return DLTokenL_GetLast(list);
 }
 
 void DLTokenL_UnFetchNext(DLTokenL *list){
-	printf("UnFetch token: %s (%s)\n",DLTokenL_GetLast(list)->value->string, tokenTypos[DLTokenL_GetLast(list)->tokenType]);
+	//printf("UnFetch token: %s (%s)\n",DLTokenL_GetLast(list)->value->string, tokenTypos[DLTokenL_GetLast(list)->tokenType]);
 	UnGetToken(DLTokenL_GetLast(list));
 	DLTokenL_DeleteLast(list);
 }
@@ -19,13 +23,16 @@ DLTokenL* DLTokenL_CopyFromActive(DLTokenL *copiedList){
 	}
 	
 	DLTokenL* listCopy = DLTokenL_Create();
-	DLTokenLElementPtr keepActive = copiedList->activeElement;
 	while (DLTokenL_IsActive(copiedList))
 	{
-		DLTokenL_InsertLast(listCopy, DLTokenL_GetActive(copiedList));
+		dynamic_string* stringCopy = malloc(sizeof(dynamic_string));
+		initialize_string(stringCopy);
+		add_str_to_string(stringCopy, DLTokenL_GetActive(copiedList)->value->string);
+
+
+		DLTokenL_InsertLast(listCopy, makeToken(stringCopy, DLTokenL_GetActive(copiedList)->tokenType));
 		DLTokenL_Next(copiedList);
 	}
-	copiedList->activeElement = keepActive;
 
 	return listCopy;
 }
