@@ -7,9 +7,9 @@
 typedef enum
 {
     EOS,
-    STOP,
-    TERM,
-    NONTERM
+    EXP,
+    VAR,
+    OPE
 }item_type;
 
 //stack for precedence analysis
