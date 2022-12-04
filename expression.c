@@ -44,17 +44,18 @@ prec_table_index type_to_job(int type)
     case closeBracket:
         return R_BRACKET;
     // TODO
-    // case typeInt:
-    // case typeString:
-    // case typeFloat:
-    // case variable:
-    //     return DATA;
+    case integer:
+    case ffloat:
+    case variable:
+    case nnull:
+        return DATA;
     default:
         return DOLLAR;
     }
 }
 
-bool push(Stack_t* stack, token* token){
+bool push(Stack_t *stack, token *token)
+{
     switch (token->tokenType)
     {
     case ffloat:
@@ -62,43 +63,82 @@ bool push(Stack_t* stack, token* token){
     case integer:
     case nnull:
     case variable:
-        if(!stack_push(stack, VAR, token, true)) return false;
+        if (!stack_push(stack, VAR, token, true))
+            return false;
         break;
 
     default:
-        if(!stack_push(stack, OPE, token, false)) return false;
+        if (!stack_push(stack, OPE, token, false))
+            return false;
         break;
     }
     return true;
 }
 
-// // nemusi byt, Marek uz kontroluje
-// bool valid_type(token *token)
-// {
-//     switch (token->tokenType)
-//     {
-//     case typeInt:
-//     case typeString:
-//     case typeFloat:
-//     case variable:
-//     case add:
-//     case mul:
-//     case sub:
-//     case ddiv:
-//     case openBracket:
-//     case closeBracket:
-//     // case concat:
-//     case cmpEqual:
-//     case notEquals:
-//     case greater:
-//     case lower:
-//     case greaterEqual:
-//     case lowerEqual:
-//         return true;
-//     default:
-//         return false;
-//     }
-// }
+bool reduce(Stack_t *stack, token *token)
+{
+    if (!(stack->top->stop))
+        return false;
+
+    //  var
+    if (stack->top->stack_type == VAR)
+    {
+        stack->top->stack_type = EXP;
+        stack_pop(stack);
+        //  tvoreni stromu
+        return true;
+    }
+
+    // (E)
+    if (stack->top->token->tokenType == openBracket && stack->top->next->stack_type == EXP && stack->top->next->next->token->tokenType == closeBracket)
+    {
+        // stack->top->next->next->token = stack->top->next->token;
+        // stack->top->next->next->stack_type = stack->top->next->stack_type;
+        // stack->top->next->next->stop = stack->top->next->stop;
+        // stack->top->next->next->next = stack->top->next->next;
+        stack->top->next->next = stack->top->next;
+        stack_pop(stack);
+        stack_pop(stack);
+        //  tvoreni stromu
+        return true;
+    }
+
+    int op1 = stack->top->stack_type;
+    int op2 = stack->top->next->token->tokenType;
+    int op3 = stack->top->next->next->stack_type;
+
+    if (op1 != EXP || op3 != EXP)
+        return false;
+
+    switch (op2)
+    {
+    case add:
+    case mul:
+    case ddiv:
+    // case concat:
+    case sub:
+    case cmpEqual:
+    case notEquals:
+    case greaterEqual:
+    case lower:
+    case greater:
+    case lowerEqual:
+        stack_pop(stack);
+        stack_pop(stack);
+        return true;
+
+    default:
+        return false;
+    }
+}
+
+bool equal(Stack_t *stack, token *token)
+{
+    if (!stack_push(stack, OPE, token, false))
+        return false;
+
+    return true;
+}
 
 void precedence(DLTokenL *token_list)
 {
