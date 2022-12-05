@@ -2,18 +2,18 @@
 
 int prec_table[TABLE_SIZE][TABLE_SIZE] = {
     //        */|+-.|< |>|<=|>=|===|!==|(|)|var|$
-    /*  *  */ {P, P, P, P, P, P, P, P, R, P, R, P},
-    /* +-. */ {R, P, P, P, P, P, P, P, R, P, R, P},
-    /*  <  */ {R, R, P, E, E, E, P, P, R, P, R, P},
-    /*  >  */ {R, R, E, P, E, E, P, P, R, P, R, P},
-    /* <=  */ {R, R, E, E, P, E, P, P, R, P, R, P},
-    /* >=  */ {R, R, E, E, E, P, P, P, R, P, R, P},
-    /* === */ {R, R, R, R, R, R, P, E, R, P, R, P},
-    /* !== */ {R, R, R, R, R, R, E, P, R, P, R, P},
-    /*  (  */ {R, R, R, R, R, R, R, R, R, S, R, P},
-    /*  )  */ {P, P, P, P, P, P, P, P, E, P, E, P},
-    /* var */ {P, P, P, P, P, P, P, P, E, P, E, P},
-    /*  $  */ {R, R, R, R, R, R, R, R, R, R, R, E},
+    /*  *  */ {R, R, R, R, R, R, R, R, P, R, P, R},
+    /* +-. */ {P, R, R, R, R, R, R, R, P, R, P, R},
+    /*  <  */ {P, P, R, E, E, E, R, R, P, R, P, R},
+    /*  >  */ {P, P, E, R, E, E, R, R, P, R, P, R},
+    /* <=  */ {P, P, E, E, R, E, R, R, P, R, P, R},
+    /* >=  */ {P, P, E, E, E, R, R, R, P, R, P, R},
+    /* === */ {P, P, P, P, P, P, R, E, P, R, P, R},
+    /* !== */ {P, P, P, P, P, P, E, R, P, R, P, R},
+    /*  (  */ {P, P, P, P, P, P, P, P, P, S, P, R},
+    /*  )  */ {R, R, R, R, R, R, R, R, E, R, E, R},
+    /* var */ {R, R, R, R, R, R, R, R, E, R, E, R},
+    /*  $  */ {P, P, P, P, P, P, P, P, P, E, P, D},
 };
 
 prec_table_index type_to_job(int type)
@@ -84,7 +84,6 @@ bool reduce(Stack_t *stack, token *token)
     if (stack->top->stack_type == VAR)
     {
         stack->top->stack_type = EXP;
-        // stack_pop(stack);
         //  tvoreni stromu
         return true;
     }
@@ -180,9 +179,11 @@ void precedence(DLTokenL *token_list)
     DLTokenL_First(token_list);
     token *exp_token;
 
-    token eos; //$ na spodu zasobniku
+    token eos; //$ na spodu zasobniku a listu
     if (stack_push(&stack, EOS, &eos, true))
         exit(99);
+    
+    DLTokenL_InsertLast(token_list, &eos);
 
     int input_symbol;
     int top_symbol;
@@ -193,7 +194,12 @@ void precedence(DLTokenL *token_list)
         exp_token = DLTokenL_GetActive(token_list);
 
         input_symbol = exp_token->tokenType;
-        top_symbol = stack.top->token->tokenType;
+        // hledam TERMY a NON TERMY
+        if (stack.top->stack_type != EXP) {
+            top_symbol = stack.top->token->tokenType;
+        } else {
+            top_symbol = stack.top->next->token->tokenType;
+        }
 
         switch (prec_table[type_to_job(top_symbol)][type_to_job(input_symbol)])
         {
@@ -206,25 +212,28 @@ void precedence(DLTokenL *token_list)
             //  push
             if (!push(&stack, exp_token))
                 exit(99); //    TODO co za chybu
+            // Ziskani noveho tokenu
+            DLTokenL_Next(token_list);
             break;
         case S:
             //  = equal
             if (!stack_push(&stack, OPE, exp_token, false))
-                exit(99); //    TODO co za chybu
+                     exit(99); //    TODO co za chybu
+            // Ziskani noveho tokenu
+            DLTokenL_Next(token_list);
             break;
+        case D:
+            //  done
+            return;
         case E:
             //  error
             exit(99); //    TODO co za chybu
             break;
         }
-
-        // Ziskani noveho tokenu
-        DLTokenL_Next(token_list);
     }
     return;
 };
 
-int main(void)
-{
+int main(void){
     return 0;
 }

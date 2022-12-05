@@ -30,7 +30,8 @@ typedef enum
     P, // <
     R, // >
     S, // =
-    E  // error
+    E, // error
+    D  // done
 } prec_table_job;
 
 void precedence(DLTokenL *token_list);
