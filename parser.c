@@ -299,10 +299,10 @@ void compoundStatement(){
                 DEBUG DLTokenL_Print(expressionTokens);
                 
                 if (DLTokenL_GetLength(expressionTokens) == 0 && !type_is_nullable(currFunctionReturnType))
-                    exit(61); //return; ve funkci s nenullovantelným typem
+                    exit(6); //return; ve funkci s nenullovantelným typem
                 
                 else if (DLTokenL_GetLength(expressionTokens) > 0 && currFunctionReturnType == typeVoid)
-                    exit(62); //retuen exp; ve funkci typu void
+                    exit(6); //retuen exp; ve funkci typu void
 
                 else{
                     //TODO typ_z_precedencky
@@ -326,7 +326,7 @@ void compoundStatement(){
     }
 
     if (inFunctionDefinition && !returnStatementOccurred && currFunctionReturnType != typeVoid)
-        exit(63);    
+        exit(6);    
 
     DEBUG printf("\x1B[35mout of compound statement\033[0m\n");
 }
