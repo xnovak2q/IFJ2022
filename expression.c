@@ -43,11 +43,11 @@ prec_table_index type_to_job(int type)
         return L_BRACKET;
     case closeBracket:
         return R_BRACKET;
-    // TODO
     case integer:
     case ffloat:
     case variable:
     case nnull:
+    case sstring:
         return DATA;
     default:
         return DOLLAR;
@@ -80,25 +80,24 @@ bool reduce(Stack_t *stack, token *token)
     if (!(stack->top->stop))
         return false;
 
-    //  var
+    //  var TODO
     if (stack->top->stack_type == VAR)
     {
         stack->top->stack_type = EXP;
-        stack_pop(stack);
+        // stack_pop(stack);
         //  tvoreni stromu
         return true;
     }
 
     // (E)
-    if (stack->top->token->tokenType == openBracket && stack->top->next->stack_type == EXP && stack->top->next->next->token->tokenType == closeBracket)
+    if (stack->top->token->tokenType == closeBracket && stack->top->next->stack_type == EXP && stack->top->next->next->token->tokenType == openBracket)
     {
-        // stack->top->next->next->token = stack->top->next->token;
-        // stack->top->next->next->stack_type = stack->top->next->stack_type;
-        // stack->top->next->next->stop = stack->top->next->stop;
-        // stack->top->next->next->next = stack->top->next->next;
-        stack->top->next->next = stack->top->next;
         stack_pop(stack);
+        stack->top->next->stack_type = stack->top->stack_type;
+        stack->top->next->stop = stack->top->stop;
+        stack->top->next->token = stack->top->token;
         stack_pop(stack);
+
         //  tvoreni stromu
         return true;
     }
@@ -113,32 +112,63 @@ bool reduce(Stack_t *stack, token *token)
     switch (op2)
     {
     case add:
+        // strom
+        printf("E+E -> E");
+        break;
     case mul:
+        // strom
+        printf("E*E -> E");
+        break;
     case ddiv:
+        // strom
+        printf("E/E -> E");
+        break;
     // case concat:
     case sub:
+        // strom
+        printf("E-E -> E");
+        break;
     case cmpEqual:
+        // strom
+        printf("E===E -> E");
+        break;
     case notEquals:
+        // strom
+        printf("E!==E -> E");
+        break;
     case greaterEqual:
+        // strom
+        printf("E>=E -> E");
+        break;
     case lower:
+        // strom
+        printf("E<E -> E");
+        break;
     case greater:
+        // strom
+        printf("E>E -> E");
+        break;
     case lowerEqual:
-        stack_pop(stack);
-        stack_pop(stack);
-        return true;
+        // strom
+        printf("E<=E -> E");
+        break;
 
     default:
         return false;
     }
-}
 
-bool equal(Stack_t *stack, token *token)
-{
-    if (!stack_push(stack, OPE, token, false))
-        return false;
-
+    stack_pop(stack);
+    stack_pop(stack);
     return true;
 }
+
+// bool equal(Stack_t *stack, token *token)
+// {
+//     if (!stack_push(stack, OPE, token, false))
+//         return false;
+
+//     return true;
+// }
 
 void precedence(DLTokenL *token_list)
 {
@@ -179,7 +209,7 @@ void precedence(DLTokenL *token_list)
             break;
         case S:
             //  = equal
-            if (!equal(&stack, exp_token))
+            if (!stack_push(&stack, OPE, exp_token, false))
                 exit(99); //    TODO co za chybu
             break;
         case E:
@@ -193,3 +223,8 @@ void precedence(DLTokenL *token_list)
     }
     return;
 };
+
+int main(void)
+{
+    return 0;
+}

@@ -33,15 +33,14 @@ typedef enum
     E  // error
 } prec_table_job;
 
-void precedence(DLTokenL* token_list);
+void precedence(DLTokenL *token_list);
 
 prec_table_index type_to_job(int type);
 
-bool reduce(Stack_t* stack, token* token);
+bool reduce(Stack_t *stack, token *token);
 
-bool push(Stack_t* stack, token* token);
+bool push(Stack_t *stack, token *token);
 
-bool equal(Stack_t* stack, token* token);
-
+// bool equal(Stack_t* stack, token* token);
 
 #endif
