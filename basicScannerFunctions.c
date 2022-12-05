@@ -141,9 +141,9 @@ bool isDollar(char x){
 }
 
 bool isValidText(char x){
-    return isOperator(x) || isspace(x) || x == EOF;
+    return isOperator(x) || isspace(x) || isEOF(x);
 }
 
 bool isValidOper(char x){
-    return isLetterUnderNumber(x) || isDollar(x) || isspace(x) || isOperator(x) || isQuot(x) || x == EOF;
+    return isLetterUnderNumber(x) || isDollar(x) || isspace(x) || isOperator(x) || isQuot(x) || isEOF(x);
 }
