@@ -16,9 +16,9 @@ void loadFunctionDefs(){
     Symtable_InsertSymbol(&globalFunctionsTable, identifier_readf, nullableFloat);
     int* args_readf = (int*)malloc(0 * sizeof(int)); Symtable_SetFunctionArgs(globalFunctionsTable, identifier_readf, 0, args_readf);
 
-    char* identifier_write = (char*)malloc((5 +1)* sizeof(char)); identifier_write = "write"; //neomezený počet argumentů!
+    char* identifier_write = (char*)malloc((5 +1)* sizeof(char)); identifier_write = "write"; //o až ∞ argumentů!
     Symtable_InsertSymbol(&globalFunctionsTable, identifier_write, typeVoid);
-    int* args_write = (int*)malloc(1 * sizeof(int)); args_write[0] = typeAny; Symtable_SetFunctionArgs(globalFunctionsTable, identifier_write, 1, args_write);
+    int* args_write = (int*)malloc(0 * sizeof(int)); Symtable_SetFunctionArgs(globalFunctionsTable, identifier_write, 0, args_write);
 
     char* identifier_floatval = (char*)malloc((8 +1)* sizeof(char)); identifier_floatval = "floatval";
     Symtable_InsertSymbol(&globalFunctionsTable, identifier_floatval, typeFloat);
@@ -114,9 +114,9 @@ void runAnalysis(){
         DLTokenL_FetchNext(tokenList);
     }
 
-    DEBUG printf("\n\x1B[1m\x1B[30mglobalFunctionsTable:\033[0m\n");
+    DEBUG printf("\n\x1B[1m\x1B[30mglobalFunctionsTable\033[0m\n");
     DEBUG Symtable_PrintInorder(globalFunctionsTable);
-    DEBUG printf("\n\x1B[1m\x1B[30mglobalVariablesTable:\033[0m\n");
+    DEBUG printf("\n\x1B[1m\x1B[30mglobalVariablesTable\033[0m\n");
     DEBUG Symtable_PrintInorder(globalVariablesTable);
 
     Symtable_Dispose(&globalFunctionsTable);
@@ -124,7 +124,7 @@ void runAnalysis(){
     Symtable_Dispose(&localVariablesTable);
     DLTokenL_Dispose(tokenList);
 
-    DEBUG printf("\n\x1B[1m\x1B[32m▒█▀▀▀█ ▒█░▒█ ▒█▀▀█ ▒█▀▀█ ▒█▀▀▀ ▒█▀▀▀█ ▒█▀▀▀█\n░▀▀▀▄▄ ▒█░▒█ ▒█░░░ ▒█░░░ ▒█▀▀▀ ░▀▀▀▄▄ ░▀▀▀▄▄\n▒█▄▄▄█ ░▀▄▄▀ ▒█▄▄█ ▒█▄▄█ ▒█▄▄▄ ▒█▄▄▄█ ▒█▄▄▄█\033[0m\n\n");
+    DEBUG printf("\n\x1B[1m\x1B[32mSuccess ✔\033[0m\n\n");
 }
 
 //LL Grammar
@@ -168,20 +168,18 @@ void functionCall(){
             startBracketCount = -1;
 
         
-        DLTokenL* expressionList = consumeExpression(false, startBracketCount);
-
+        DLTokenL* expressionTokens = consumeExpression(false, startBracketCount);
         if (isFirstArgument && !isLastArgument)
-            DLTokenL_DeleteFirst(expressionList);
+            DLTokenL_DeleteFirst(expressionTokens);
         else if(!isFirstArgument && isLastArgument)
-            DLTokenL_DeleteLast(expressionList);
+            DLTokenL_DeleteLast(expressionTokens);
+        DEBUG DLTokenL_Print(expressionTokens);
 
-        DEBUG DLTokenL_Print(expressionList);
-
-        //TODO binary_tree* expressionTree = precedencka(expressionList);
-        //TODO generator_variableDeclaration(variableName, , expressionTree);
-        DLTokenL_Dispose(expressionList);
-
-        //TODO parametr n
+        //TODO binary_tree* expressionTree = precedencka(expressionTokens);
+        //TODO data_type_z_precedencky
+        //TODO if(!types_match(data_type_z_precedencky, Symtable_GetFunctionArgType(..))) exit(4);
+        //TODO generator_variableDeclaration(variableName, , expressionTree); pro lokalni promennou
+        DLTokenL_Dispose(expressionTokens);
 
         isFirstArgument = false;
         if (isLastArgument){
@@ -192,9 +190,7 @@ void functionCall(){
         }
     }
     
-    programDepth++;
-    //TODO generate function call;
-    programDepth--;
+    //TODO generate function call
     DEBUG printf("\x1B[35mout of function call\033[0m\n");
 }
 
@@ -242,18 +238,58 @@ void compoundStatement(){
     if (!is_compoundStatement())
         exit(2);
     DEBUG printf("\x1B[36min compound statement\033[0m\n");
-    programDepth++;
+
+    
     
     DLTokenL_FetchNext(tokenList);
     while (DLTokenL_GetLast(tokenList)->tokenType != closeCurly)
     {
-        statement();
+        if (inFunctionDefinition && is_returnStatement()){
+            DEBUG printf("\x1B[36min return statement\033[0m\n");
+            DLTokenL_FetchNext(tokenList);
+            if (is_functionCall())
+            {
+                if (Symtable_ExistsSymbol(globalFunctionsTable, DLTokenL_GetLast(tokenList)->value->string))
+                {
+                    if (types_match(Symtable_GetType(globalFunctionsTable, DLTokenL_GetLast(tokenList)->value->string), currFunctionReturnType)){
+                        functionCall();
+                        DLTokenL_FetchNext(tokenList);
+                    }
+                    else exit(4); //nesprávný návratový typ volané funkce
+                    
+                } else exit(3); //funkce neexistuje
+                
+            } else{
+                DLTokenL* expressionTokens = consumeExpression(true, 0);
+                DEBUG DLTokenL_Print(expressionTokens);
+                
+                if (DLTokenL_GetLength(expressionTokens) == 0 && !type_is_nullable(currFunctionReturnType))
+                    exit(6); //return; ve funkci s nenullovantelným typem
+                
+                else if (DLTokenL_GetLength(expressionTokens) > 0 && currFunctionReturnType == typeVoid)
+                    exit(6); //retuen exp; ve funkci typu void
+
+                else{
+                    //TODO typ_z_precedencky
+                    //TODO types_match(typ_z_precedencky), currFunctionReturnType)
+                }
+
+                DLTokenL_Dispose(expressionTokens);
+            }
+
+            printf("%s\n", DLTokenL_GetLast(tokenList)->value->string);
+            if (DLTokenL_GetLast(tokenList)->tokenType != semicolumn)
+                exit(2);
+
+            DEBUG printf("\x1B[35mout of return statement\033[0m\n");
+        } else
+            statement(); 
+
         DLTokenL_FetchNext(tokenList);
         if (DLTokenL_GetLast(tokenList)->tokenType == end)
             exit(2);   
     }
 
-    programDepth--;
     DEBUG printf("\x1B[35mout of compound statement\033[0m\n");
 }
 
@@ -264,6 +300,7 @@ void functionDefinition(){
     DEBUG printf("\x1B[36min function definition\033[0m\n");
     
     currVariablesTable = localVariablesTable;
+    inFunctionDefinition = true;
 
     if (DLTokenL_FetchNext(tokenList)->tokenType != identificator) exit(2);
     if(DLTokenL_FetchNext(tokenList)->tokenType != openBracket) exit(2); // function Foo->(<-string $x, int $y): bool {}
@@ -288,12 +325,16 @@ void functionDefinition(){
     
     if (DLTokenL_FetchNext(tokenList)->tokenType != colon) exit(2);
     if (!token_is_type(DLTokenL_FetchNext(tokenList))) exit(2);
-    //TODO zaznamenat jmeno a datatyp funkce
+
+    currFunctionReturnType = DLTokenL_GetLast(tokenList)->tokenType;
 
     DLTokenL_FetchNext(tokenList);
     compoundStatement();
+    DEBUG printf("\x1B[1m\x1B[30mlocalVariablesTable\033[0m\n");
+    DEBUG Symtable_PrintInorder(currVariablesTable);
     currVariablesTable = globalVariablesTable;
     Symtable_Clear(&localVariablesTable);
+    inFunctionDefinition = false;
     DEBUG printf("\x1B[35mout of function definition\033[0m\n");
 }
 

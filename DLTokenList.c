@@ -350,3 +350,17 @@ token* DLTokenL_GetActive(DLTokenL *list) {
 
 	return list->activeElement->token;
 }
+
+size_t DLTokenL_GetLength(DLTokenL *list){
+	if (list == NULL) return 0;
+
+	size_t length = 0;
+	DLTokenLElementPtr currElement = list->firstElement;
+	while (currElement)
+	{
+		length++;
+		currElement = currElement->nextElement;
+	}
+
+	return length;
+}

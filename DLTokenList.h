@@ -49,5 +49,6 @@ void DLTokenL_Previous(DLTokenL*);
 bool DLTokenL_IsActive(DLTokenL*);
 token* DLTokenL_GetActive(DLTokenL *list);
 DLTokenL* DLTokenL_CopyFromActive(DLTokenL *copiedList);
+size_t DLTokenL_GetLength(DLTokenL *list);
 
 #endif //IFJ2022_DLTOKENLIST_H

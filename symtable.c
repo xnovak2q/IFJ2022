@@ -380,10 +380,12 @@ char* smtbletokentypos[] = {
  */
 void Symtable_PrintNode(Symtable_node *node) {
     if (!node || !node->symbol)
-        printf("\x1B[30m[\\\\, \\\\, \\\\]\033[0m\n");
+        //printf("\x1B[30m[\\\\, \\\\, \\\\]\033[0m\n");
+        printf("\x1B[30m[\\\\, \\\\]\033[0m\n");
     else{
         char* type = node->symbol->dataType == -1 ? "\\\\" : smtbletokentypos[node->symbol->dataType];
-        printf("\x1B[30m[%zu, %s, %s]", node->key, node->symbol->identifier, type);
+        //printf("\x1B[30m[%zu, %s, %s]", node->key, node->symbol->identifier, type);
+        printf("\x1B[30m[%s, %s]", node->symbol->identifier, type);
 
         if (node->functionArgs){
             printf(": ");
