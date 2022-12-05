@@ -1,17 +1,16 @@
 <?php
 declare(strict_types=1);
 
-function floatFoo(): float{
-
+function floatFoo(): void{
+    
+    return;
 }
 
-function no(int $ok): void {
-
-    return 1;
+function no(int $ok): int {
+    return "a";
 }
 
 no("a");
 
-$a = 2; 
-$b = $a; 
-no(3/$b,4+4); 
+$a = no(2);
+no(1); 

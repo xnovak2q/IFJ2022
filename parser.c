@@ -132,7 +132,9 @@ void runAnalysis(){
 void functionCall(){
     DEBUG printf("\x1B[36min function call\033[0m\n");
 
-    if (!Symtable_ExistsSymbol(globalFunctionsTable, DLTokenL_GetLast(tokenList)->value->string))
+    char* functionName = DLTokenL_GetLast(tokenList)->value->string;
+
+    if (!Symtable_ExistsSymbol(globalFunctionsTable, functionName))
         exit(3);    
 
     DLTokenL_FetchNext(tokenList); //(
@@ -141,6 +143,10 @@ void functionCall(){
     bool isFirstArgument = true;
     int tokensToReturn = 1;
     int startBracketCount;
+
+    size_t argumentCount = 0;
+    int* argumentTypes = (int*)malloc(0);
+    int currArgType;
 
     while (DLTokenL_FetchNext(tokenList)->tokenType != closeBracket)
     {
@@ -175,9 +181,30 @@ void functionCall(){
             DLTokenL_DeleteLast(expressionTokens);
         DEBUG DLTokenL_Print(expressionTokens);
 
+        argumentCount++;
+        argumentTypes = (int*)realloc(argumentTypes, argumentCount * sizeof(int));
+
         //TODO binary_tree* expressionTree = precedencka(expressionTokens);
-        //TODO data_type_z_precedencky
-        //TODO if(!types_match(data_type_z_precedencky, Symtable_GetFunctionArgType(..))) exit(4);
+        currArgType = 9; //TODO data_type_z_precedencky
+        argumentTypes[argumentCount-1] = currArgType;
+
+        if (strcmp(functionName, "write")){//není write()
+            if (Symtable_GetFunctionArgsCount(globalFunctionsTable, functionName) < argumentCount) exit(4);
+
+            if (!strcmp(functionName, "intval")){         //je intval()
+                if (currArgType != typeInt && currArgType != typeFloat) exit(4);
+            } else if (!strcmp(functionName, "floatval")){//je floatval()
+                if (currArgType != typeInt && currArgType != typeFloat) exit(4);
+            } else if (!strcmp(functionName, "strval")){  //je strval()
+                if (currArgType != typeString && currArgType != nnull) exit(4);
+            } else{//je uživatelem definovaná funkce
+                if(!types_match(currArgType, Symtable_GetFunctionArgType(globalFunctionsTable, functionName, argumentCount-1))) exit(4);
+            }
+
+        } else {//je write()
+            if (currArgType != typeInt && currArgType != typeFloat && currArgType != nnull) exit(4);
+        }
+
         //TODO generator_variableDeclaration(variableName, , expressionTree); pro lokalni promennou
         DLTokenL_Dispose(expressionTokens);
 
@@ -189,6 +216,11 @@ void functionCall(){
             DLTokenL_UnFetchNext(tokenList);
         }
     }
+
+    if (strcmp(functionName, "write") && //není write()
+        Symtable_GetFunctionArgsCount(globalFunctionsTable, functionName) != argumentCount)
+        exit(4);
+    
     
     //TODO generate function call
     DEBUG printf("\x1B[35mout of function call\033[0m\n");
@@ -240,11 +272,14 @@ void compoundStatement(){
     DEBUG printf("\x1B[36min compound statement\033[0m\n");
 
     
-    
+    bool returnStatementOccurred = false;
+
     DLTokenL_FetchNext(tokenList);
     while (DLTokenL_GetLast(tokenList)->tokenType != closeCurly)
     {
         if (inFunctionDefinition && is_returnStatement()){
+            returnStatementOccurred = true;
+
             DEBUG printf("\x1B[36min return statement\033[0m\n");
             DLTokenL_FetchNext(tokenList);
             if (is_functionCall())
@@ -264,10 +299,10 @@ void compoundStatement(){
                 DEBUG DLTokenL_Print(expressionTokens);
                 
                 if (DLTokenL_GetLength(expressionTokens) == 0 && !type_is_nullable(currFunctionReturnType))
-                    exit(6); //return; ve funkci s nenullovantelným typem
+                    exit(61); //return; ve funkci s nenullovantelným typem
                 
                 else if (DLTokenL_GetLength(expressionTokens) > 0 && currFunctionReturnType == typeVoid)
-                    exit(6); //retuen exp; ve funkci typu void
+                    exit(62); //retuen exp; ve funkci typu void
 
                 else{
                     //TODO typ_z_precedencky
@@ -289,6 +324,9 @@ void compoundStatement(){
         if (DLTokenL_GetLast(tokenList)->tokenType == end)
             exit(2);   
     }
+
+    if (inFunctionDefinition && !returnStatementOccurred && currFunctionReturnType != typeVoid)
+        exit(63);    
 
     DEBUG printf("\x1B[35mout of compound statement\033[0m\n");
 }
@@ -471,6 +509,10 @@ void variableDefinition(){
         exit(2);
 
     if (is_functionCall()) {
+        char* functionName = DLTokenL_GetLast(tokenList)->value->string;
+        if (!Symtable_ExistsSymbol(globalFunctionsTable, functionName)) exit(3);
+        variableType = Symtable_GetType(globalFunctionsTable, functionName);
+
         functionCall();
         DLTokenL_FetchNext(tokenList);
     } else {
