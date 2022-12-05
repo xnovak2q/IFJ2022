@@ -1,3 +1,6 @@
+<?php
+declare(strict_types=1);
+
 // Program 2: Vypocet faktorialu (rekurzivne)
 // Hlavni telo programu
 write("Zadejte cislo pro vypocet faktorialu: ");
@@ -18,7 +21,7 @@ if ($a === null) {
     if ($a < 0) { // Pokracovani hlavniho tela programu
         write("Faktorial nelze spocitat\n");
     } else {
-        //$vysl = factorial($a);
+        $vysl = factorial($a);
         write("Vysledek je: ", $vysl, "\n");
     }
 

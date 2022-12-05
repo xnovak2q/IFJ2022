@@ -18,6 +18,7 @@ char* tokenTypos[] = {
     "nullableString",
     "nullableFloat",
     "nullableVoid",
+    "typeAny",
     "integer", 
     "exponent", 
     "ffloat", 

@@ -1,5 +1,22 @@
-function no(int $ok, float $aha): float {
+<?php
+declare(strict_types=1);
+
+function no(int $ok): int {
+    {
+        c(3);
+    }
+}
+
+function c(int $ok): int {
+
+    {
+        $b = 123;
+    }
     
 }
 
-$a = 2;
+no(2);
+
+$a = 2; 
+$b = $a; 
+no(3/$b); 

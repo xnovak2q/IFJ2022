@@ -37,12 +37,7 @@ Symtable_node* Symtable_Create() {
 
 /*
  * Nájdenie uzlu v strome.
- *
- * V prípade úspechu vráti funkcia hodnotu true a do premennej value zapíše
- * hodnotu daného uzlu. V opačnom prípade funckia vráti hodnotu false a premenná
- * value ostáva nezmenená.
- *
- * Funkciu implementujte rekurzívne bez použitia vlastných pomocných funkcií.
+ * V prípade úspechu vráti funkcia hodnotu true, v opačnom prípade funckia vráti hodnotu false
  */
 bool Symtable_ExistsSymbol(Symtable_node *tree, char* identifier) {
     size_t key = Symtable_HashKey(identifier);
@@ -223,13 +218,13 @@ void Symtable_Dispose(Symtable_node **tree) {
  *
  * Funkciu implementujte rekurzívne bez použitia vlastných pomocných funkcií.
  */
-void Symtable_Preorder(Symtable_node *tree) {
+void Symtable_PrintPreorder(Symtable_node *tree) {
     if(tree != NULL) {
         Symtable_PrintNode(tree);
         if (tree->left != NULL)
-            Symtable_Preorder(tree->left);
+            Symtable_PrintPreorder(tree->left);
         if (tree->right != NULL)
-            Symtable_Preorder(tree->right);
+            Symtable_PrintPreorder(tree->right);
     }
 }
 
@@ -240,13 +235,13 @@ void Symtable_Preorder(Symtable_node *tree) {
  *
  * Funkciu implementujte rekurzívne bez použitia vlastných pomocných funkcií.
  */
-void Symtable_Inorder(Symtable_node *tree) {
+void Symtable_PrintInorder(Symtable_node *tree) {
     if(tree != NULL) {
         if (tree->left != NULL)
-            Symtable_Inorder(tree->left);
+            Symtable_PrintInorder(tree->left);
         Symtable_PrintNode(tree);
         if (tree->right != NULL)
-            Symtable_Inorder(tree->right);
+            Symtable_PrintInorder(tree->right);
     }
 }
 /*
@@ -256,24 +251,14 @@ void Symtable_Inorder(Symtable_node *tree) {
  *
  * Funkciu implementujte rekurzívne bez použitia vlastných pomocných funkcií.
  */
-void Symtable_Postorder(Symtable_node *tree) {
+void Symtable_PrintPostorder(Symtable_node *tree) {
     if(tree != NULL) {
         if (tree->left != NULL)
-            Symtable_Postorder(tree->left);
+            Symtable_PrintPostorder(tree->left);
         if (tree->right != NULL)
-            Symtable_Postorder(tree->right);
+            Symtable_PrintPostorder(tree->right);
         Symtable_PrintNode(tree);
     }
-}
-
-/*
- * Pomocná funkcia ktorá vypíše uzol stromu.
- */
-void Symtable_PrintNode(Symtable_node *node) {
-    if (!node || !node->symbol)
-        printf("[\\\\, \\\\, \\\\]\n");
-    else    
-        printf("[%zu, %s, %d]\n", node->key, node->symbol->identifier, node->symbol->dataType);
 }
 
 int Symtable_GetType(Symtable_node *tree, char* identifier){
@@ -339,5 +324,75 @@ void Symtable_SetFunctionArgs(Symtable_node *tree, char* functionName, size_t ar
             else
                 Symtable_SetFunctionArgs(tree->right, functionName, argCount, argTypes);
         }
+    }
+}
+
+char* smtbletokentypos[] = {
+    "iff",
+    "eelse",
+    "ffunction",
+    "nnull",
+    "rreturn",
+    "wwhile", 
+    "identificator", 
+    "variable", 
+    "sstring", 
+    "typeInt", 
+    "typeString", 
+    "typeFloat", 
+    "typeVoid",
+    "nullableInt", 
+    "nullableString",
+    "nullableFloat",
+    "nullableVoid",
+    "typeAny",
+    "integer", 
+    "exponent", 
+    "ffloat", 
+    "add", 
+    "sub", 
+    "mul", 
+    "ddiv", 
+    "openBracket", 
+    "closeBracket", 
+    "openCurly", 
+    "closeCurly", 
+    "openSquare", 
+    "closeSquare", 
+    "equal", 
+    "cmpEqual", 
+    "notEquals", 
+    "greater", 
+    "lower", 
+    "greaterEqual", 
+    "lowerEqual", 
+    "semicolumn",
+    "concat",
+    "end",
+    "declare",
+    "prolog",
+    "comma",
+    "colon"
+};
+
+/*
+ * Pomocná funkcia ktorá vypíše uzol stromu.
+ */
+void Symtable_PrintNode(Symtable_node *node) {
+    if (!node || !node->symbol)
+        printf("\x1B[30m[\\\\, \\\\, \\\\]\033[0m\n");
+    else{
+        char* type = node->symbol->dataType == -1 ? "\\\\" : smtbletokentypos[node->symbol->dataType];
+        printf("\x1B[30m[%zu, %s, %s]", node->key, node->symbol->identifier, type);
+
+        if (node->functionArgs){
+            printf(": ");
+            if (node->functionArgsCount == 0)
+                printf("no_arguments");
+            else for (size_t i = 0; i < node->functionArgsCount; i++)
+                printf("%s ", smtbletokentypos[node->functionArgs[i]]);
+        }
+
+        printf("\033[0m\n");
     }
 }

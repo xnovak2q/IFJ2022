@@ -32,6 +32,7 @@ enum tokenType {
     nullableString,
     nullableFloat,
     nullableVoid,
+    typeAny,
     integer,
     exponent,
     ffloat,

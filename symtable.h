@@ -32,9 +32,9 @@ void Symtable_InsertSymbol(Symtable_node **tree, char* identifier, int dataType)
 bool Symtable_ExistsSymbol(Symtable_node *tree, char* identifier);
 void Symtable_DeleteSymbol(Symtable_node **tree, char* identifier);
 
-void Symtable_Preorder(Symtable_node *tree);
-void Symtable_Inorder(Symtable_node *tree);
-void Symtable_Postorder(Symtable_node *tree);
+void Symtable_PrintPreorder(Symtable_node *tree);
+void Symtable_PrintInorder(Symtable_node *tree);
+void Symtable_PrintPostorder(Symtable_node *tree);
 
 void Symtable_ReplaceByRightmost(Symtable_node *target, Symtable_node **tree);
 
