@@ -3,13 +3,7 @@
 #include "codegen.h"
 #include "parser.h"
 
-
-void codegen_print_prolog (){
-    printf(".IFJcode22");
-}
-
-
-static int while_lvl = 0;
+//static int while_lvl = 0;
 
 //TODO void codegen_push_variable(char* var){}
 //TODO char* string_converter(char* str2convert){}
@@ -26,6 +20,24 @@ static int while_lvl = 0;
 *operations
 
 */
+void codegen_print_prolog (){
+    printf(".IFJcode22");
+}
+
+/// @brief funkce na alokaci instrukce
+/// @return ukaxatel na instrukci
+inst_t* create_new_inst(){
+    inst_t inst = (inst_t*)malloc(sizeof(inst_t));
+    if (!inst)
+        exit(ERR_INTERN);
+
+    inst->prev_inst = NULL;
+    inst->next_inst = NULL;
+    
+    initialize_string(&inst->inst_content);
+    return inst;
+}
+
 //TODO tbd
 char* string_converter(char* string2conv){
     if(string2conv == NULL)
@@ -37,33 +49,65 @@ char* string_converter(char* string2conv){
 
     dynamic_string* string = malloc(sizeof(dynamic_string));
     initialize_string(string);
-    add_str_to_string(string, string2conv);
+    //add_str_to_string(string, string2conv);
     while (*string2conv != '\0'){
         if(*string2conv == ' ')
             add_str_to_string(string, "\\032");
-        if(*string2conv == '92'){
-            add_char_to_string(string, "\\");
-
-            if(!isdigit(*(string2conv+1))){
-                string2conv++;
+        else if(*string2conv == '\\'){
+            //printf("tady1\n");
+            add_char_to_string(string, '\\');
+            if (!isdigit(*(string2conv+1)))
+            {
+                //string2conv++;
 
                 switch (*string2conv)
                 {
-                case 'n':
-                    add_str_to_string(string, "010");
+                case '\\':
+                    add_str_to_string(string, "092");
                     break;
 
                 case 't':
                     add_str_to_string(string, "009");
                     break;
-                
+
                 default:
                     break;
                 }
+
             }
+
+
+            // if(!isdigit(*(string2conv+1))){
+            //     string2conv++;
+
+            //     switch (*string2conv)
+            //     {
+            //     case 'n':
+            //         add_str_to_string(string, "010");
+            //         break;
+
+                
+
+            //     case '\\':
+            //         /*printf("tady2");
+            //         add_char_to_string(string, '0');
+            //         add_char_to_string(string, '9');
+            //         add_char_to_string(string, '2');*/
+            //         add_str_to_string(string, "092");
+            //         break;
+
+            //     default:
+            //         break;
+            //     }
+            // }
         }
+        else add_char_to_string(string, *string2conv);
+
+        string2conv++;
     }
-    
+
+    return string->string;
+
 }
 
 
@@ -100,9 +144,9 @@ void codegen_push_nil(){
 
 
 /*==============IF=====================TODO while*/
-
+/*
 void codegen_if_begin(){
-    /*stack TODO unique label stackTOP*/
+    stack TODO unique label stackTOP
     if(!while_lvl){
         printf("POPS GF@exp\n");
         printf("JUMPIFNEQ if$%d$else GF@exp bool@true\n", unifyingint);
@@ -121,19 +165,21 @@ void codegen_if_end(){
         printf("LABEL if$%d$end\n", unifyingint);
     }
 }
+*/
 
-
-/*=======================WHILE================*/
+/*=======================WHILE================
 
 void codegen_while_begin(){//TODO
     while_lvl++;
+    printf();
 }
 
 void codegen_while_cond(){
-    if
+
 }
 
 void codegen_while_end(){
-    if()
-}
 
+    printf("JUMP");
+}
+*/
