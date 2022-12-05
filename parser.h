@@ -12,6 +12,7 @@ bool flag_debug = true;
 bool flag_prolog = true;
 
 bool inFunctionDefinition = false;
+bool returnStatementOccurred = false;
 int currFunctionReturnType;
 
 void loadFunctionDefs();

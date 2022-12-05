@@ -179,7 +179,7 @@ void functionCall(){
             DLTokenL_DeleteFirst(expressionTokens);
         else if(!isFirstArgument && isLastArgument)
             DLTokenL_DeleteLast(expressionTokens);
-        DEBUG DLTokenL_Print(expressionTokens);
+        //DEBUG DLTOKENL_Print(expressionTokens);
 
         argumentCount++;
         argumentTypes = (int*)realloc(argumentTypes, argumentCount * sizeof(int));
@@ -233,7 +233,7 @@ void whileStatement(){
     
     DLTokenL* expressionTokens = consumeExpression(false, 0);
     //TODO precedencka(expressionTokens);
-    DEBUG DLTokenL_Print(expressionTokens);
+    //DEBUG DLTOKENL_Print(expressionTokens);
     DLTokenL_Dispose(expressionTokens);
 
     compoundStatement();
@@ -247,7 +247,7 @@ void ifStatement(){
     
     DLTokenL* expressionTokens = consumeExpression(false, 0);
     //TODO precedencka(expressionTokens);
-    DEBUG DLTokenL_Print(expressionTokens);
+    //DEBUG DLTOKENL_Print(expressionTokens);
     DLTokenL_Dispose(expressionTokens);
 
     compoundStatement();
@@ -255,6 +255,7 @@ void ifStatement(){
     DLTokenL_FetchNext(tokenList);
     if (is_elseStatement())
         elseStatement();
+    else DLTokenL_UnFetchNext(tokenList);
     
     DEBUG printf("\x1B[35mout of if statement\033[0m\n");
 }
@@ -272,8 +273,6 @@ void compoundStatement(){
     DEBUG printf("\x1B[36min compound statement\033[0m\n");
 
     
-    bool returnStatementOccurred = false;
-
     DLTokenL_FetchNext(tokenList);
     while (DLTokenL_GetLast(tokenList)->tokenType != closeCurly)
     {
@@ -296,7 +295,7 @@ void compoundStatement(){
                 
             } else{
                 DLTokenL* expressionTokens = consumeExpression(true, 0);
-                DEBUG DLTokenL_Print(expressionTokens);
+                //DEBUG DLTOKENL_Print(expressionTokens);
                 
                 if (DLTokenL_GetLength(expressionTokens) == 0 && !type_is_nullable(currFunctionReturnType))
                     exit(6); //return; ve funkci s nenullovantelným typem
@@ -312,17 +311,19 @@ void compoundStatement(){
                 DLTokenL_Dispose(expressionTokens);
             }
 
-            printf("%s\n", DLTokenL_GetLast(tokenList)->value->string);
             if (DLTokenL_GetLast(tokenList)->tokenType != semicolumn)
                 exit(2);
 
             DEBUG printf("\x1B[35mout of return statement\033[0m\n");
-        } else
-            statement(); 
+        } else {
+            
+            statement();
+        }
+            
 
         DLTokenL_FetchNext(tokenList);
         if (DLTokenL_GetLast(tokenList)->tokenType == end)
-            exit(2);   
+            exit(2);
     }
 
     if (inFunctionDefinition && !returnStatementOccurred && currFunctionReturnType != typeVoid)
@@ -333,12 +334,12 @@ void compoundStatement(){
 
 
 void functionDefinition(){
-    //if (!is_functionDefinitionHeader() || programDepth != 0) exit(2);
     if (!is_functionDefinitionHeader()) exit(2);
     DEBUG printf("\x1B[36min function definition\033[0m\n");
     
     currVariablesTable = localVariablesTable;
     inFunctionDefinition = true;
+    returnStatementOccurred = false;
 
     if (DLTokenL_FetchNext(tokenList)->tokenType != identificator) exit(2);
     if(DLTokenL_FetchNext(tokenList)->tokenType != openBracket) exit(2); // function Foo->(<-string $x, int $y): bool {}
@@ -362,9 +363,11 @@ void functionDefinition(){
     
     
     if (DLTokenL_FetchNext(tokenList)->tokenType != colon) exit(2);
-    if (!token_is_type(DLTokenL_FetchNext(tokenList))) exit(2);
+    DLTokenL_FetchNext(tokenList);
 
     currFunctionReturnType = DLTokenL_GetLast(tokenList)->tokenType;
+    if (!token_is_type(DLTokenL_GetLast(tokenList)) || currFunctionReturnType == nnull)
+        exit(2);
 
     DLTokenL_FetchNext(tokenList);
     compoundStatement();
@@ -512,6 +515,8 @@ void variableDefinition(){
         char* functionName = DLTokenL_GetLast(tokenList)->value->string;
         if (!Symtable_ExistsSymbol(globalFunctionsTable, functionName)) exit(3);
         variableType = Symtable_GetType(globalFunctionsTable, functionName);
+        if (variableType == typeVoid) exit(4);
+        
 
         functionCall();
         DLTokenL_FetchNext(tokenList);
@@ -520,7 +525,7 @@ void variableDefinition(){
         //TODO binary_tree* expressionTree = precedencka(expressionList);
         //TODO generator_variableDeclaration(variableName, , expressionTree);
         //variableType = getTypeFromPrecedenceTree(expressionTree);
-        DEBUG DLTokenL_Print(expressionList);
+        //DEBUG DLTOKENL_Print(expressionList);
         DLTokenL_Dispose(expressionList);
     }
 
