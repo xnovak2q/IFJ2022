@@ -474,6 +474,8 @@ void UnGetToken(token* token){
         ungetc('$', stdin);
     else if (token->tokenType == sstring)
         ungetc('"', stdin);
+    else if (token->tokenType == end)
+        ungetc('\0', stdin);
     
     ungetc(' ', stdin);
     free_token(token);

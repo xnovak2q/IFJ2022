@@ -23,7 +23,10 @@ typedef struct {
 	DLTokenLElementPtr lastElement;
 } DLTokenL;
 
+void DLTokenL_Print(DLTokenL *list);
 token* DLTokenL_FetchNext(DLTokenL *list);
+void DLTokenL_UnFetchNext(DLTokenL *list);
+void DLTokenL_UnFetchAll(DLTokenL *list);
 struct DLTokenLElement* DLTokenL_GetLastElement(DLTokenL *list);
 DLTokenL* DLTokenL_Create();
 void DLTokenL_Dispose(DLTokenL*);

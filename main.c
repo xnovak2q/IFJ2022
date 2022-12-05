@@ -7,5 +7,5 @@
 #include "basicScannerFunctions.c"
 
 int main(){
-    return runAnalysis();
+    runAnalysis();
 }

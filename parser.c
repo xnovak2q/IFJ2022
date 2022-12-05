@@ -1,8 +1,30 @@
 #include "parser.h"
 
-int runAnalysis(){
+void loadFunctionDefs(){
+    printf("\x1B[36mLoading function definitions\033[0m\n");
+
+    DLTokenL_FetchNext(tokenList);
+    while (DLTokenL_GetLast(tokenList)->tokenType != end)
+    {
+        if (is_functionDefinitionHeader())
+            loadFunctionDefinition();
+        DLTokenL_FetchNext(tokenList);
+    }
+
+    DLTokenL_UnFetchAll(tokenList);
+    printf("\x1B[35mFunction definitions loaded\033[0m\n\n");
+}
+
+
+void runAnalysis(){
+    globalFunctionsTable = Symtable_Create();
+    globalVariablesTable = Symtable_Create();
+    localVariablesTable = Symtable_Create();
+    currVariablesTable = globalVariablesTable;
+
     tokenList = DLTokenL_Create();
     programDepth = 0;
+    
 /* 
     DLTokenL_FetchNext(tokenList);
     if (DLTokenL_GetLast(tokenList)->tokenType != prolog)
@@ -22,7 +44,28 @@ int runAnalysis(){
         DLTokenL_Dispose(tokenList); exit(2);
     } */
 
-    printf("\n\x1B[36mAt top level\033[0m\n");
+    loadFunctionDefs();
+
+    /* 
+    DLTokenL_FetchNext(tokenList);
+    if (DLTokenL_GetLast(tokenList)->tokenType != prolog)
+    {
+       DLTokenL_Dispose(tokenList); exit(2);
+    }
+
+    DLTokenL_FetchNext(tokenList);
+    if (DLTokenL_GetLast(tokenList)->tokenType != declare)
+    {
+        DLTokenL_Dispose(tokenList); exit(2);
+    } 
+
+    DLTokenL_FetchNext(tokenList);
+    if (DLTokenL_GetLast(tokenList)->tokenType != semicolumn)
+    {
+        DLTokenL_Dispose(tokenList); exit(2);
+    } */
+
+    printf("\x1B[36mAt top level\033[0m\n");
     DLTokenL_FetchNext(tokenList);
 
     while (DLTokenL_GetLast(tokenList)->tokenType != end)
@@ -31,20 +74,23 @@ int runAnalysis(){
             functionDefinition();
         else statement();
         printf("\n\x1B[36mAt top level\033[0m\n");
-        DLTokenL_FetchNext(tokenList);
+        DLTokenL_FetchNext(tokenList);//segfault
     }
 
+    Symtable_Inorder(globalVariablesTable);
+    Symtable_Inorder(localVariablesTable);
 
+    Symtable_Dispose(&globalVariablesTable);
+    Symtable_Dispose(&localVariablesTable);
     DLTokenL_Dispose(tokenList);
-    return 0;
 }
 
 
-bool is_ifStatement()               { return DLTokenL_GetLast(tokenList)->tokenType == iff       ;}
-bool is_whileStatement()            { return DLTokenL_GetLast(tokenList)->tokenType == wwhile    ;}
-bool is_elseStatement()             { return DLTokenL_GetLast(tokenList)->tokenType == eelse     ;}
-bool is_functionDefinitionHeader()  { return DLTokenL_GetLast(tokenList)->tokenType == ffunction ;}
-bool is_compoundStatement()         { return DLTokenL_GetLast(tokenList)->tokenType == openCurly ;}
+bool is_ifStatement()              { return DLTokenL_GetLast(tokenList)->tokenType == iff       ;}
+bool is_whileStatement()           { return DLTokenL_GetLast(tokenList)->tokenType == wwhile    ;}
+bool is_elseStatement()            { return DLTokenL_GetLast(tokenList)->tokenType == eelse     ;}
+bool is_functionDefinitionHeader() { return DLTokenL_GetLast(tokenList)->tokenType == ffunction ;}
+bool is_compoundStatement()        { return DLTokenL_GetLast(tokenList)->tokenType == openCurly ;}
 bool is_variableDefinition(){
     DLTokenL_FetchNext(tokenList);
     bool isVariableDefinition = DLTokenL_GetLast(tokenList)->tokenType == equal && DLTokenL_GetLastElement(tokenList)->previousElement->token->tokenType == variable;
@@ -122,6 +168,7 @@ bool token_is_expressionMember(token* token){
         case sub:
         case mul:
         case ddiv:
+        case concat:
         case openBracket:
         case closeBracket:
         case cmpEqual:
@@ -173,19 +220,22 @@ void functionCall(){
             startBracketCount = 1;
         else if(!isLastArgument)
             startBracketCount = -1;
-        isFirstArgument = false;
-        
+
         
         DLTokenL* expressionList = consumeExpression(false, startBracketCount);
+
+        if (isFirstArgument && !isLastArgument)
+            DLTokenL_DeleteFirst(expressionList);
+        else if(!isFirstArgument && isLastArgument)
+            DLTokenL_DeleteLast(expressionList);
+
         //TODO binary_tree* expressionTree = precedencka(expressionList);
         //TODO generator_variableDeclaration(variableName, , expressionTree);
         DLTokenL_Dispose(expressionList);
 
         //TODO parametr n
 
-        /* if (startRoundBracketCount == 0 && DLTokenL_GetLast(tokenList)->tokenType != comma)
-            exit(2); */
-
+        isFirstArgument = false;
         if (isLastArgument){
             DLTokenL_UnFetchNext(tokenList);
             if (DLTokenL_GetLast(tokenList)->tokenType != closeBracket)
@@ -261,8 +311,9 @@ void compoundStatement(){
 void functionDefinition(){
     //if (!is_functionDefinitionHeader() || programDepth != 0) exit(2);
     if (!is_functionDefinitionHeader()) exit(2);
-
     printf("\x1B[36min function definition\033[0m\n");
+    
+    currVariablesTable = localVariablesTable;
 
     if (DLTokenL_FetchNext(tokenList)->tokenType != identificator) exit(2);
     if(DLTokenL_FetchNext(tokenList)->tokenType != openBracket) exit(2); // function Foo->(<-string $x, int $y): bool {}
@@ -275,8 +326,11 @@ void functionDefinition(){
         while (DLTokenL_GetLast(tokenList)->tokenType != closeBracket)
         {
             if (!token_is_type(DLTokenL_FetchNext(tokenList)))        exit(2);
+            int argType = DLTokenL_GetLast(tokenList)->tokenType;
             if (DLTokenL_FetchNext(tokenList)->tokenType != variable) exit(2);
-            //TODO zaznamenat promennou a datatyp do noveho LF
+            Symtable_InsertSymbol(&currVariablesTable, DLTokenL_GetLast(tokenList)->value->string, argType);
+            Symtable_InsertSymbol(&currVariablesTable, DLTokenL_GetLast(tokenList)->value->string, argType);
+
             if (DLTokenL_FetchNext(tokenList)->tokenType != comma && DLTokenL_GetLast(tokenList)->tokenType != closeBracket) exit(2);
         }
     }
@@ -288,7 +342,79 @@ void functionDefinition(){
 
     DLTokenL_FetchNext(tokenList);
     compoundStatement();
+    currVariablesTable = globalVariablesTable;
+    Symtable_Clear(&localVariablesTable);
     printf("\x1B[35mout of function definition\033[0m\n");
+}
+
+void loadFunctionDefinition(){
+    if (!is_functionDefinitionHeader()) return;
+    printf("\x1B[36mloading function definition\033[0m\n");
+    
+    if (DLTokenL_FetchNext(tokenList)->tokenType != identificator) return;
+    char* functionName = DLTokenL_GetLast(tokenList)->value->string;
+
+    size_t functionArgsCount = 0;
+    int* functionArgs = (int*)malloc(0);
+
+    if(DLTokenL_FetchNext(tokenList)->tokenType != openBracket) return; // function Foo->(<-string $x, int $y): bool {}
+    
+    if (DLTokenL_FetchNext(tokenList)->tokenType == closeBracket)
+    {
+        //TODO function without parameters
+    } else {
+        DLTokenL_UnFetchNext(tokenList); // zpet na ->(<-
+        while (DLTokenL_GetLast(tokenList)->tokenType != closeBracket)
+        {
+            if (!token_is_type(DLTokenL_FetchNext(tokenList)))        return;
+            int argType = DLTokenL_GetLast(tokenList)->tokenType;
+            functionArgsCount++;
+            functionArgs = (int*)realloc(functionArgs, functionArgsCount * sizeof(int));
+            functionArgs[functionArgsCount-1] = argType;
+
+            if (DLTokenL_FetchNext(tokenList)->tokenType != variable) return;
+
+
+            if (DLTokenL_FetchNext(tokenList)->tokenType != comma && DLTokenL_GetLast(tokenList)->tokenType != closeBracket) return;
+        }
+    }
+    
+    
+    if (DLTokenL_FetchNext(tokenList)->tokenType != colon) return;
+    if (!token_is_type(DLTokenL_FetchNext(tokenList))) return;
+
+    int functionReturnType = DLTokenL_GetLast(tokenList)->tokenType;
+    Symtable_InsertSymbol(&globalFunctionsTable, functionName, functionReturnType);
+    Symtable_SetFunctionArgs(globalFunctionsTable, functionName, functionArgsCount, functionArgs);
+
+   /*  if ( Symtable_ExistsSymbol(globalFunctionsTable, functionName) )
+    {
+        printf("%s: %s\n", functionName, tokenTypos[Symtable_GetType(globalFunctionsTable, functionName)]);
+        printf("%zu - ", Symtable_GetFunctionArgsCount(globalFunctionsTable, functionName));
+
+        for (size_t i = 0; i < Symtable_GetFunctionArgsCount(globalFunctionsTable, functionName); i++)
+            printf("%s ", tokenTypos[Symtable_GetFunctionArgType(globalFunctionsTable, functionName, i)]);
+        
+        printf("\n");
+    } */
+    
+
+    DLTokenL_FetchNext(tokenList);
+    if (!is_compoundStatement())
+        return;
+    DLTokenL_FetchNext(tokenList);
+    int curlyBracketCount = 1;
+    while (curlyBracketCount > 0 && DLTokenL_GetLast(tokenList)->tokenType != end)
+    {
+        if (DLTokenL_GetLast(tokenList)->tokenType == openCurly)
+            curlyBracketCount++;
+        else if (DLTokenL_GetLast(tokenList)->tokenType == closeCurly)
+            curlyBracketCount--;
+    }
+    if (curlyBracketCount != 0)
+        return;
+    
+    printf("\x1B[35mfunction definition %s():%s loaded\033[0m\n", functionName, tokenTypos[Symtable_GetType(globalFunctionsTable, functionName)]);
 }
 
 void lineStatement(){
@@ -333,6 +459,7 @@ DLTokenL* consumeExpression(bool canBeEmpty, int startingRoundBracketCount){
 
     DLTokenL* returnedList = DLTokenL_CopyFromActive(tokenList);
     DLTokenL_DeleteLast(returnedList);
+    DLTokenL_Print(returnedList);
     printf("\x1B[35mout of expression\033[0m\n");
     return returnedList;
 }
@@ -340,21 +467,29 @@ DLTokenL* consumeExpression(bool canBeEmpty, int startingRoundBracketCount){
 void variableDefinition(){
     printf("\x1B[36min variable definition\033[0m\n");
 
-    //dynamic_string* variableName = DLTokenL_GetLast(tokenList)->value;
+    char* variableName = DLTokenL_GetLast(tokenList)->value->string;
+    int variableType = 0;
     DLTokenL_FetchNext(tokenList);
     DLTokenL_FetchNext(tokenList);
 
     if (!is_lineStatement(tokenList))
         exit(2);
 
-    DLTokenL* expressionList = consumeExpression(false, 0);
-    //TODO binary_tree* expressionTree = precedencka(expressionList);
-    //TODO generator_variableDeclaration(variableName, , expressionTree);
-    DLTokenL_Dispose(expressionList);
+    if (is_functionCall()) {
+        functionCall();
+        DLTokenL_FetchNext(tokenList);
+    } else {
+        DLTokenL* expressionList = consumeExpression(false, 0);
+        //TODO binary_tree* expressionTree = precedencka(expressionList);
+        //TODO generator_variableDeclaration(variableName, , expressionTree);
+        //variableType = getTypeFromPrecedenceTree(expressionTree);
+        DLTokenL_Dispose(expressionList);
+    }
 
     if (DLTokenL_GetLast(tokenList)->tokenType != semicolumn)
         exit(2);
 
+    Symtable_InsertSymbol(&currVariablesTable, variableName, variableType);
     printf("\x1B[35mout of variable definition\033[0m\n");
 }
 

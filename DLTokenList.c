@@ -1,10 +1,36 @@
 #include "DLTokenList.h"
 
+void DLTokenL_Print(DLTokenL *list){
+	DLTokenLElementPtr currElement = list->firstElement;
+	int maxTypeIndentation = 0;
+	while (currElement)
+	{
+		if (maxTypeIndentation < currElement->token->value->string_length)
+			maxTypeIndentation = currElement->token->value->string_length;
+		currElement = currElement->nextElement;
+	}
+
+	currElement = list->firstElement;
+	int i = 0;
+	int currTypeIndentation;
+	while (currElement)
+	{
+		printf("\x1B[92m%d: %s",i,currElement->token->value->string);
+		currTypeIndentation = maxTypeIndentation - currElement->token->value->string_length;
+		if (currTypeIndentation > 0)
+			for(size_t indent_i = 0; indent_i < currTypeIndentation; indent_i++) printf(" ");
+		
+		printf(" (%s)\033[0m\n",tokenTypos[currElement->token->tokenType]);
+		currElement = currElement->nextElement; i++;
+	}
+}
+
 token* DLTokenL_FetchNext(DLTokenL *list){
-	if (list->lastElement != NULL && DLTokenL_GetLast(list)->tokenType == end)
+	if (list->lastElement != NULL && DLTokenL_GetLast(list)->tokenType == end){
 		DLTokenL_InsertLast(list, makeToken(NULL, end));
-	else
+	} else {
 		DLTokenL_InsertLast(list, GetToken());
+	}
 
     //printf("Fetch token: %s (%s)\n",DLTokenL_GetLast(list)->value->string, tokenTypos[DLTokenL_GetLast(list)->tokenType]);
 	return DLTokenL_GetLast(list);
@@ -14,6 +40,10 @@ void DLTokenL_UnFetchNext(DLTokenL *list){
 	//printf("UnFetch token: %s (%s)\n",DLTokenL_GetLast(list)->value->string, tokenTypos[DLTokenL_GetLast(list)->tokenType]);
 	UnGetToken(DLTokenL_GetLast(list));
 	DLTokenL_DeleteLast(list);
+}
+void DLTokenL_UnFetchAll(DLTokenL *list){
+	while (list->lastElement != NULL)
+		DLTokenL_UnFetchNext(list);
 }
 
 DLTokenL* DLTokenL_CopyFromActive(DLTokenL *copiedList){

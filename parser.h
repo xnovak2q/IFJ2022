@@ -9,17 +9,17 @@
 #include "DLTokenList.c"
 #include "dynamic_string.h"
 #include "basicScannerFunctions.h"
+#include "symtable.c"
 
-
-typedef struct{
-    enum ddataType{floatt, intt, stringg} dataType;
-    dynamic_string* identifier;
-    dynamic_string* value;
-} var;
-
-DLTokenL *tokenList;
+DLTokenL* tokenList;
+Symtable_node* globalVariablesTable;
+Symtable_node* localVariablesTable;
+Symtable_node* currVariablesTable;
+Symtable_node* globalFunctionsTable;
 int programDepth;
 
+void loadFunctionDefs();
+void runAnalysis();
 
 bool is_ifStatement();
 bool is_whileStatement();
@@ -38,6 +38,8 @@ bool is_variableDefinition();
 void variableDefinition();
 bool is_functionCall();
 void functionCall();
+
+void loadFunctionDefinition();
 
 
 #endif //IFJ2022_PARSER_H

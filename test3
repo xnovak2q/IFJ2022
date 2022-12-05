@@ -1,0 +1,5 @@
+function no(int $ok, float $aha): float {
+    
+}
+
+$a = 2;

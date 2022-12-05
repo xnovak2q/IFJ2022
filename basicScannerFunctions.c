@@ -78,7 +78,7 @@ bool isSlash(char x){
     return x == '/';
 }
 bool isEOF(char x){
-    return x == EOF;
+    return x == EOF || x == '\0';
 }
 
 void skipLineComment(){
