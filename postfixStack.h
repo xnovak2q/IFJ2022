@@ -3,20 +3,24 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "scanner.h"
 
-#define MAX_STACK 50
+typedef struct postStack_item
+{
+    token* token;
+    struct postStack_item* next;
+} postStack_item_t;
+
 
 typedef struct 
 {
-    char array[MAX_STACK];
-    int topIndex;
+    postStack_item_t* top;
 } postStack_t;
 
 void Stack_Init ( postStack_t* s );
-int Stack_IsEmpty ( const postStack_t* s );
-int Stack_IsFull ( const postStack_t* s );
-void Stack_Top ( const postStack_t* s, char* c );
+bool Stack_IsEmpty ( postStack_t* s );
+token* Stack_Top ( postStack_t* s);
 void Stack_Pop ( postStack_t* s );
-void Stack_Push ( postStack_t* s, char c );
+void Stack_Push ( postStack_t* s, token* c );
 
 #endif
