@@ -20,23 +20,77 @@
 *operations
 
 */
-void codegen_print_prolog (){
-    printf(".IFJcode22");
-}
+
+
 
 /// @brief funkce na alokaci instrukce
-/// @return ukaxatel na instrukci
+/// @return ukazatel na instrukci
 inst_t* create_new_inst(){
-    inst_t inst = (inst_t*)malloc(sizeof(inst_t));
+    inst_t *inst = /*(inst_t)*/malloc(sizeof(struct instruction));
     if (!inst)
-        exit(ERR_INTERN);
-
+    {
+         exit(ERR_INTERN);
+    }
     inst->prev_inst = NULL;
     inst->next_inst = NULL;
     
     initialize_string(&inst->inst_content);
     return inst;
 }
+
+void cg_ins_last(out_code *out, char *instruction){
+    inst_t *new = create_new_inst();
+
+    add_str_to_string(&new->inst_content, instruction);
+
+    //linking
+    if (!out->first_inst)
+    {
+        out->first_inst = new;
+    }
+    
+    new->prev_inst = out->last_inst;
+    new->next_inst = NULL;
+    
+    if(out->last_inst != )
+    
+    out->last_inst = new;
+}
+
+
+// void cg_prog_init(out_code *out){
+//     out->first_inst = NULL;
+//     out->last_inst = NULL;
+//     out->while_lvl = 0;
+// }
+
+
+void codegen_print_prog(out_code *out){
+    inst_t *tmp = out->first_inst;
+    if(!out->first_inst)
+        return;
+    while (tmp)
+    {
+        printf("%s", tmp->inst_content.string);
+        tmp = tmp->next_inst;
+    }
+}
+//dispose
+
+void codegen_print_prolog (){
+    printf(".IFJcode22\n");
+}
+
+void codegen_init(out_code *out){
+    codegen_print_prolog();
+    //cg_prog_init(out);
+
+}
+
+
+/*variables*/
+static int is_while = 0;
+
 
 //TODO tbd
 char* string_converter(char* string2conv){
@@ -114,26 +168,26 @@ char* string_converter(char* string2conv){
 /*===============PUSH STACK ======================*/
 
 void codegen_push_string(char* string){
-    if(!while_lvl){
+    if(!is_while){
         printf("PUSHS string@%s",string_converter(string));
     }
 }
 
 void codegen_push_int(int n){
-    if(!while_lvl){
+    if(!is_while){
         printf("PUSHS int@%d\n", n);
     }
 }
 
 
 void codegen_push_float(float f){
-    if(!while_lvl){
+    if(!is_while){
         printf("PUSHS float@%a\n", f);
     }
 }
 
 void codegen_push_nil(){
-    if(!while_lvl){
+    if(!is_while){
         printf("PUSHS nil@nil\n");
     }
 }
@@ -144,33 +198,34 @@ void codegen_push_nil(){
 
 
 /*==============IF=====================TODO while*/
-/*
-void codegen_if_begin(){
-    stack TODO unique label stackTOP
-    if(!while_lvl){
+
+void codegen_if_begin(int unif){
+    //stack TODO unique label stackTOP
+    if(!is_while){
         printf("POPS GF@exp\n");
-        printf("JUMPIFNEQ if$%d$else GF@exp bool@true\n", unifyingint);
+        printf("JUMPIFNEQ if$%d$else GF@exp bool@true\n", unif);
     }
 }
 
-void codegen_if_else(){
-    if(!while_lvl){
-        printf("JUMP if%d$end\n", unifyingint);
-        printf("LABEL if$%d$else\n");
+void codegen_if_else(int unif){
+    if(!is_while){
+        printf("JUMP if%d$end\n", unif);
+        printf("LABEL if$%d$else\n", unif);
     }
 }
 
-void codegen_if_end(){
-    if(!while_lvl){
-        printf("LABEL if$%d$end\n", unifyingint);
+void codegen_if_end(int unif){
+    if(!is_while){
+        printf("LABEL if$%d$end\n", unif);
     }
 }
-*/
 
-/*=======================WHILE================
+
+/*=======================WHILE================TODO
 
 void codegen_while_begin(){//TODO
-    while_lvl++;
+    is_while = 1;
+    out_code->while_lvl++;//legit?
     printf();
 }
 
@@ -181,5 +236,12 @@ void codegen_while_cond(){
 void codegen_while_end(){
 
     printf("JUMP");
+}
+*/
+
+/*=======BUILT IN FUNCS===========
+
+void codegen_write(){
+
 }
 */

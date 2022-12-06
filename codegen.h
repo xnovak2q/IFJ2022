@@ -27,4 +27,6 @@ typedef struct output_code{
 
 //TODO deklarace funkci
 
+
+
 #endif //IFJ22_CODEGEN_H
