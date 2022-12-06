@@ -80,15 +80,16 @@ bool reduce(Stack_t *stack, token *token)
     if (!(stack->top->stop))
         return false;
 
-    //  var TODO
+    //  var -> E
     if (stack->top->stack_type == VAR)
     {
         stack->top->stack_type = EXP;
+        // je root stromu NULL? --> INSERT NODE
         //  tvoreni stromu
         return true;
     }
 
-    // (E)
+    // (E) -> E
     if (stack->top->token->tokenType == closeBracket && stack->top->next->stack_type == EXP && stack->top->next->next->token->tokenType == openBracket)
     {
         stack_pop(stack);
@@ -161,14 +162,6 @@ bool reduce(Stack_t *stack, token *token)
     return true;
 }
 
-// bool equal(Stack_t *stack, token *token)
-// {
-//     if (!stack_push(stack, OPE, token, false))
-//         return false;
-
-//     return true;
-// }
-
 void precedence(DLTokenL *token_list)
 {
     Stack_t stack;
@@ -182,7 +175,7 @@ void precedence(DLTokenL *token_list)
     token eos; //$ na spodu zasobniku a listu
     if (stack_push(&stack, EOS, &eos, true))
         exit(99);
-    
+
     DLTokenL_InsertLast(token_list, &eos);
 
     int input_symbol;
@@ -195,9 +188,12 @@ void precedence(DLTokenL *token_list)
 
         input_symbol = exp_token->tokenType;
         // hledam TERMY a NON TERMY
-        if (stack.top->stack_type != EXP) {
+        if (stack.top->stack_type != EXP)
+        {
             top_symbol = stack.top->token->tokenType;
-        } else {
+        }
+        else
+        {
             top_symbol = stack.top->next->token->tokenType;
         }
 
@@ -218,7 +214,7 @@ void precedence(DLTokenL *token_list)
         case S:
             //  = equal
             if (!stack_push(&stack, OPE, exp_token, false))
-                     exit(99); //    TODO co za chybu
+                exit(99); //    TODO co za chybu
             // Ziskani noveho tokenu
             DLTokenL_Next(token_list);
             break;
@@ -231,9 +227,14 @@ void precedence(DLTokenL *token_list)
             break;
         }
     }
+
+    // infix -> postfix
+    // postfix -> Expression tree
     return;
 };
 
-int main(void){
+int main(void)
+{
+    
     return 0;
 }

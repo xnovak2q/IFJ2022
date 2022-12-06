@@ -2,7 +2,8 @@
 #define STACK_H
 
 #include <stdbool.h>
-#include "expression.h"
+#include <stdlib.h>
+#include "scanner.h"
 
 typedef enum
 {

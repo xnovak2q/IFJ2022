@@ -2,7 +2,7 @@
 
 token* DLTokenL_FetchNext(DLTokenL *list){
 	DLTokenL_InsertLast(list, GetToken());
-    printf("Token: type = %s, value = %s\n", tokenTypos[DLTokenL_GetLast(list)->tokenType],DLTokenL_GetLast(list)->value->string);
+    //printf("Token: type = %s, value = %s\n", tokenTyp[DLTokenL_GetLast(list)->tokenType],DLTokenL_GetLast(list)->value->string);
 	return DLTokenL_GetLast(list);
 }
 
