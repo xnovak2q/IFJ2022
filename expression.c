@@ -22,7 +22,7 @@ prec_table_index type_to_job(int type)
     {
     case add:
     case sub:
-        // case concat:
+    case concat:
         return PLUS_MINUS_DOT;
     case mul:
     case ddiv:
@@ -123,7 +123,9 @@ bool reduce(Stack_t *stack, token *token)
         // strom
         printf("E/E -> E");
         break;
-    // case concat:
+    case concat:
+        printf("E.E -> E");
+        break;
     case sub:
         // strom
         printf("E-E -> E");
