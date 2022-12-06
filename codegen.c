@@ -52,8 +52,10 @@ void cg_ins_last(out_code *out, char *instruction){
     new->prev_inst = out->last_inst;
     new->next_inst = NULL;
     
-    if(out->last_inst != )
-    
+    if(out->last_inst != NULL)
+        out->last_inst->next_inst = new;
+    else
+        out->first_inst = new;
     out->last_inst = new;
 }
 
@@ -114,7 +116,7 @@ char* string_converter(char* string2conv){
             {
                 //string2conv++;
 
-                switch (*string2conv)
+                switch (*(string2conv+1))
                 {
                 case '\\':
                     add_str_to_string(string, "092");
