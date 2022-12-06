@@ -183,7 +183,7 @@ void precedence(DLTokenL *token_list)
             //  redukce
             // printf("REDUKCE\n");
             if (!reduce(&stack, exp_token))
-                exit(99); //    TODO co za chybu
+                exit(2);
             // printf("Prosel jsem redukci\n");
             break;
         case P:
@@ -209,7 +209,7 @@ void precedence(DLTokenL *token_list)
             return;
         case E:
             //  error
-            exit(99); //    TODO co za chybu
+            exit(2); //    TODO co za chybu
             break;
         }
     }
