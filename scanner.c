@@ -18,6 +18,7 @@ char* tokenTypos[] = {
     "nullableString",
     "nullableFloat",
     "nullableVoid",
+    "typeAny",
     "integer", 
     "exponent", 
     "ffloat", 
@@ -467,9 +468,20 @@ void free_token(token* token){
 
 void UnGetToken(token* token){
     ungetc(' ', stdin);
-    for(size_t i = token->value->string_length; i > 0; i--){
+    
+    if (token->tokenType == sstring)
+        ungetc('"', stdin);
+
+    for(size_t i = token->value->string_length; i > 0; i--)
         ungetc(token->value->string[i-1], stdin);
-    }
+        
+    if (token->tokenType == variable)
+        ungetc('$', stdin);
+    else if (token->tokenType == sstring)
+        ungetc('"', stdin);
+    else if (token->tokenType == end)
+        ungetc('\0', stdin);
+    
     ungetc(' ', stdin);
     free_token(token);
 }

@@ -79,7 +79,7 @@ bool isSlash(char x){
     return x == '/';
 }
 bool isEOF(char x){
-    return x == EOF;
+    return x == EOF || x == '\0';
 }
 
 void skipLineComment(){
@@ -141,9 +141,9 @@ bool isDollar(char x){
 }
 
 bool isValidText(char x){
-    return isOperator(x) || isspace(x) || x == EOF;
+    return isOperator(x) || isspace(x) || isEOF(x);
 }
 
 bool isValidOper(char x){
-    return isLetterUnderNumber(x) || isDollar(x) || isspace(x) || isOperator(x) || isQuot(x) || x == EOF;
+    return isLetterUnderNumber(x) || isDollar(x) || isspace(x) || isOperator(x) || isQuot(x) || isEOF(x);
 }

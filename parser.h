@@ -5,28 +5,30 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#include "scanner.c"
-#include "dynamic_string.h"
-#include "basicScannerFunctions.h"
+#include "basicParserFunctions.c"
 
+#define DEBUG if(flag_debug)
+bool flag_debug = true;
+bool flag_prolog = true;
 
-typedef struct{
-    enum ddataType{floatt, intt, stringg} dataType;
-    dynamic_string* identifier;
-    dynamic_string* value;
-} var;
+bool inFunctionDefinition = false;
+bool returnStatementOccurred = false;
+int currFunctionReturnType;
 
-bool is_ifStatement();
-bool is_whileStatement();
-bool is_elseStatement();
-bool is_functionDefinitionHeader();
-bool is_compoundStatement();
+void loadFunctionDefs();
+void runAnalysis();
+
 void ifStatement();
 void whileStatement();
 void elseStatement();
 void compoundStatement();
 void functionDefinition();
 void statement();
+DLTokenL* consumeExpression(bool canBeEmpty, int startingRoundBracketCount);
+void variableDefinition();
+void functionCall();
+
+void loadFunctionDefinition();
 
 
 #endif //IFJ2022_PARSER_H
