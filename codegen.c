@@ -94,7 +94,6 @@ void codegen_init(out_code *out){
 static int is_while = 0;
 
 
-//TODO tbd
 char* string_converter(char* string2conv){
     if(string2conv == NULL)
         return NULL;
@@ -105,58 +104,17 @@ char* string_converter(char* string2conv){
 
     dynamic_string* string = malloc(sizeof(dynamic_string));
     initialize_string(string);
-    //add_str_to_string(string, string2conv);
     while (*string2conv != '\0'){
-        if(*string2conv == ' ')
-            add_str_to_string(string, "\\032");
-        else if(*string2conv == '\\'){
-            //printf("tady1\n");
+        if(*string2conv <= 32){
             add_char_to_string(string, '\\');
-            if (!isdigit(*(string2conv+1)))
-            {
-                //string2conv++;
-
-                switch (*(string2conv+1))
-                {
-                case '\\':
-                    add_str_to_string(string, "092");
-                    break;
-
-                case 't':
-                    add_str_to_string(string, "009");
-                    break;
-
-                default:
-                    break;
-                }
-
-            }
-
-
-            // if(!isdigit(*(string2conv+1))){
-            //     string2conv++;
-
-            //     switch (*string2conv)
-            //     {
-            //     case 'n':
-            //         add_str_to_string(string, "010");
-            //         break;
-
-                
-
-            //     case '\\':
-            //         /*printf("tady2");
-            //         add_char_to_string(string, '0');
-            //         add_char_to_string(string, '9');
-            //         add_char_to_string(string, '2');*/
-            //         add_str_to_string(string, "092");
-            //         break;
-
-            //     default:
-            //         break;
-            //     }
-            // }
+            add_char_to_string(string, '0');
+            add_char_to_string(string, ((*string2conv / 10) + 48) );
+            add_char_to_string(string, ((*string2conv % 10) + 48) );
         }
+        else if (*string2conv == 35)
+            add_str_to_string(string,"\\035");
+        else if(*string2conv == 92)
+            add_str_to_string(string, "\\092");
         else add_char_to_string(string, *string2conv);
 
         string2conv++;

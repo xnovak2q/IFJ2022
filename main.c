@@ -13,7 +13,7 @@ int main(){
     //return runAnalysis();
     printf("test\n");
     //str convert test tbd
-    char* test_string = "str \t ing\\lomeno";
+    char* test_string = "str \t ing\\lomeno#";
     char* mod_string = string_converter(test_string);
     //printf("\\0\n");
 
