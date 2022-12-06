@@ -237,6 +237,32 @@ void precedence(DLTokenL *token_list)
 
 int main(void)
 {
+    DLTokenL* list;
+    list = DLTokenL_Create();
+    // printf("List done\n");
+
+    dynamic_string *op1 = malloc(sizeof(dynamic_string));
+    initialize_string(op1);
+    add_char_to_string(op1, 'a');
+    token* tmp = makeToken(op1, variable);
+    DLTokenL_InsertLast(list, tmp);
+    // printf("Op1 done\n");
     
+    dynamic_string *op2 = malloc(sizeof(dynamic_string));
+    initialize_string(op2);
+    add_char_to_string(op2, '+');
+    tmp = makeToken(op2, opperator);
+    DLTokenL_InsertLast(list, tmp);
+    // printf("Op2 done\n");
+    
+    dynamic_string *op3 = malloc(sizeof(dynamic_string));
+    initialize_string(op3);
+    add_char_to_string(op3, 'b');
+    tmp = makeToken(op3, variable);
+    DLTokenL_InsertLast(list, tmp);
+    // printf("Op3 done\n");
+
+    precedence(list);
+
     return 0;
 }
