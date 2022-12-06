@@ -65,7 +65,9 @@ bool isOperator(char x){
         case ';':
         case '!':
         case ':':
+        case '.':
             return true;
+            break;
         default:
             return isMinusPlus(x) || isEqual(x) || isSlash(x) || isQuestion(x);
     }
@@ -139,9 +141,9 @@ bool isDollar(char x){
 }
 
 bool isValidText(char x){
-    return isOperator(x) || isspace(x);
+    return isOperator(x) || isspace(x) || x == EOF;
 }
 
 bool isValidOper(char x){
-    return isLetterUnderNumber(x) || isDollar(x) || isspace(x) || isOperator(x) || isQuot(x);
+    return isLetterUnderNumber(x) || isDollar(x) || isspace(x) || isOperator(x) || isQuot(x) || x == EOF;
 }
