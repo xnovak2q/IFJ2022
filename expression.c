@@ -86,8 +86,6 @@ bool reduce(Stack_t *stack, token *token)
     {
         printf("var -> E\n");
         stack->top->stack_type = EXP;
-        // je root stromu NULL? --> INSERT NODE
-        //  tvoreni stromu
         return true;
     }
 
@@ -100,8 +98,6 @@ bool reduce(Stack_t *stack, token *token)
         stack->top->next->stop = stack->top->stop;
         stack->top->next->token = stack->top->token;
         stack_pop(stack);
-
-        //  tvoreni stromu
         return true;
     }
 
