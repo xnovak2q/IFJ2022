@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+write(,);
+
 function intFoo(int $abc): int{
     if($abc){
         return $abc;

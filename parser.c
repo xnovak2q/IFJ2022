@@ -155,8 +155,12 @@ void functionCall(){
         while (token_is_expressionMember(DLTokenL_FetchNext(tokenList)))
             tokensToReturn++;
 
-        if (DLTokenL_GetLast(tokenList)->tokenType == comma)
+        if (DLTokenL_GetLast(tokenList)->tokenType == comma){
             isLastArgument = false;
+            
+            if (DLTokenL_FetchNext(tokenList)->tokenType == closeBracket) exit(2);
+            DLTokenL_UnFetchNext(tokenList);
+        }
         else
             isLastArgument = true;
 
