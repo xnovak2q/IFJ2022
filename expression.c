@@ -77,9 +77,10 @@ bool push(Stack_t *stack, token *token)
 
 bool reduce(Stack_t *stack, token *token)
 {
-    if (!(stack->top->stop)){
+    if (!(stack->top->stop))
+    {
         return false;
-        }
+    }
 
     //  var -> E
     if (stack->top->stack_type == VAR)
@@ -141,10 +142,9 @@ void precedence(DLTokenL *token_list)
     DLTokenL_First(token_list);
     token *exp_token;
 
-    
-    dynamic_string* eos_string = malloc (sizeof(dynamic_string));
+    dynamic_string *eos_string = malloc(sizeof(dynamic_string));
     add_str_to_string(eos_string, "eos_string");
-    token* eos = makeToken(eos_string, EOS); //$ na spodu zasobniku a listu
+    token *eos = makeToken(eos_string, EOS); //$ na spodu zasobniku a listu
 
     if (!stack_push(&stack, EOS, eos, true))
         exit(99);
@@ -237,14 +237,14 @@ void precedence(DLTokenL *token_list)
 //     tmp = makeToken(op1, lower);
 //     DLTokenL_InsertLast(list, tmp);
 //     // printf("Op1 done\n");
-    
+
 //     dynamic_string *op2 = malloc(sizeof(dynamic_string));
 //     initialize_string(op2);
 //     add_char_to_string(op2, '+');
 //     tmp = makeToken(op2, add);
 //     DLTokenL_InsertLast(list, tmp);
 //     // printf("Op2 done\n");
-    
+
 //     dynamic_string *op3 = malloc(sizeof(dynamic_string));
 //     initialize_string(op3);
 //     add_char_to_string(op3, ')');
@@ -257,13 +257,13 @@ void precedence(DLTokenL *token_list)
 //     add_char_to_string(op11, ')');
 //     tmp = makeToken(op11, closeBracket);
 //     DLTokenL_InsertLast(list, tmp);
-    
+
 //     dynamic_string *op4 = malloc(sizeof(dynamic_string));
 //     initialize_string(op4);
 //     add_char_to_string(op4, '*');
 //     tmp = makeToken(op4, mul);
 //     DLTokenL_InsertLast(list, tmp);
-    
+
 //     dynamic_string *op5 = malloc(sizeof(dynamic_string));
 //     initialize_string(op5);
 //     add_char_to_string(op5, '7');
