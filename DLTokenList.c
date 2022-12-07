@@ -364,3 +364,9 @@ size_t DLTokenL_GetLength(DLTokenL *list){
 
 	return length;
 }
+
+DLTokenLElementPtr DLTokenL_GetActiveElement(DLTokenL* list){
+    if(!DLTokenL_IsActive(list))
+        return NULL;
+    return list->activeElement;
+}
