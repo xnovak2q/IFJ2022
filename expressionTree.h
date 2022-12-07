@@ -11,8 +11,6 @@ typedef struct Node{
 }treeNode;
 
 treeNode* makeNode(DLTokenLElementPtr item);
-void push(treeNode* node, treeNode* head);
-treeNode* pop(treeNode* head);
 treeNode* makeTree(DLTokenL * list);
 void print2DUtil(treeNode* root, int space);
 

@@ -6,6 +6,8 @@
 #include "scanner.h"
 #include "stack.h"
 #include "DLTokenList.h"
+#include "infix2postfix.h"
+#include "expressionTree.h"
 
 #define TABLE_SIZE 12
 
@@ -34,7 +36,7 @@ typedef enum
     D  // done
 } prec_table_job;
 
-void precedence(DLTokenL *token_list);
+treeNode* precedence(DLTokenL *token_list);
 
 prec_table_index type_to_job(int type);
 

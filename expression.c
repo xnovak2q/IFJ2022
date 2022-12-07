@@ -85,7 +85,6 @@ bool reduce(Stack_t *stack, token *token)
     //  var -> E
     if (stack->top->stack_type == VAR)
     {
-        printf("var -> E\n");
         stack->top->stack_type = EXP;
         return true;
     }
@@ -93,7 +92,6 @@ bool reduce(Stack_t *stack, token *token)
     // (E) -> E
     if (stack->top->token->tokenType == closeBracket && stack->top->next->stack_type == EXP && stack->top->next->next->token->tokenType == openBracket)
     {
-        printf("(E) -> E\n");
         stack_pop(stack);
         stack->top->next->stack_type = stack->top->stack_type;
         stack->top->next->stop = stack->top->stop;
@@ -131,8 +129,9 @@ bool reduce(Stack_t *stack, token *token)
     }
 }
 
-void precedence(DLTokenL *token_list)
+treeNode* precedence(DLTokenL *token_list)
 {
+    DLTokenL* newlist = DLTokenL_Create();
     // printf("Start precedence\n");
     Stack_t stack;
     stack_initialize(&stack);
@@ -205,85 +204,85 @@ void precedence(DLTokenL *token_list)
         case D:
             //  done
             // printf("----------------------------\n");
-            // printf("End precedence\n");
-            return;
+            //printf("End precedence\n");
+            newlist = infix2postfix(token_list);
+            struct Node* node;
+            DLTokenL_Last(newlist);
+            node = makeTree(newlist);
+            //print2DUtil(node, 0);
+
+            return node;
         case E:
             //  error
             exit(2); //    TODO co za chybu
             break;
         }
     }
-
-    // infix -> postfix
-    // postfix -> Expression tree
-    return;
 };
+/*
+int main(void)
+{
+    DLTokenL* list;
+    list = DLTokenL_Create();
+    // printf("List done\n");
 
-// int main(void)
-// {
-//     DLTokenL* list;
-//     list = DLTokenL_Create();
-//     // printf("List done\n");
+    dynamic_string *op10 = malloc(sizeof(dynamic_string));
+    initialize_string(op10);
+    add_char_to_string(op10, '(');
+    token* tmp = makeToken(op10, openBracket);
+    DLTokenL_InsertLast(list, tmp);
 
-//     dynamic_string *op10 = malloc(sizeof(dynamic_string));
-//     initialize_string(op10);
-//     add_char_to_string(op10, '<');
-//     token* tmp = makeToken(op10, greater);
-//     DLTokenL_InsertLast(list, tmp);
+    dynamic_string *op1 = malloc(sizeof(dynamic_string));
+    initialize_string(op1);
+    add_char_to_string(op1, 'a');
+    tmp = makeToken(op1, variable);
+    DLTokenL_InsertLast(list, tmp);
+    // printf("Op1 done\n");
 
-//     dynamic_string *op1 = malloc(sizeof(dynamic_string));
-//     initialize_string(op1);
-//     add_char_to_string(op1, '>');
-//     tmp = makeToken(op1, lower);
-//     DLTokenL_InsertLast(list, tmp);
-//     // printf("Op1 done\n");
+    dynamic_string *op2 = malloc(sizeof(dynamic_string));
+    initialize_string(op2);
+    add_char_to_string(op2, '+');
+    tmp = makeToken(op2, add);
+    DLTokenL_InsertLast(list, tmp);
+    // printf("Op2 done\n");
 
-//     dynamic_string *op2 = malloc(sizeof(dynamic_string));
-//     initialize_string(op2);
-//     add_char_to_string(op2, '+');
-//     tmp = makeToken(op2, add);
-//     DLTokenL_InsertLast(list, tmp);
-//     // printf("Op2 done\n");
+    dynamic_string *op3 = malloc(sizeof(dynamic_string));
+    initialize_string(op3);
+    add_char_to_string(op3, 'b');
+    tmp = makeToken(op3, variable);
+    DLTokenL_InsertLast(list, tmp);
+    // printf("Op3 done\n");
 
-//     dynamic_string *op3 = malloc(sizeof(dynamic_string));
-//     initialize_string(op3);
-//     add_char_to_string(op3, ')');
-//     tmp = makeToken(op3, closeBracket);
-//     DLTokenL_InsertLast(list, tmp);
-//     // printf("Op3 done\n");
+    dynamic_string *op11 = malloc(sizeof(dynamic_string));
+    initialize_string(op11);
+    add_char_to_string(op11, ')');
+    tmp = makeToken(op11, closeBracket);
+    DLTokenL_InsertLast(list, tmp);
 
-//     dynamic_string *op11 = malloc(sizeof(dynamic_string));
-//     initialize_string(op11);
-//     add_char_to_string(op11, ')');
-//     tmp = makeToken(op11, closeBracket);
-//     DLTokenL_InsertLast(list, tmp);
+    dynamic_string *op4 = malloc(sizeof(dynamic_string));
+    initialize_string(op4);
+    add_char_to_string(op4, '*');
+    tmp = makeToken(op4, mul);
+    DLTokenL_InsertLast(list, tmp);
 
-//     dynamic_string *op4 = malloc(sizeof(dynamic_string));
-//     initialize_string(op4);
-//     add_char_to_string(op4, '*');
-//     tmp = makeToken(op4, mul);
-//     DLTokenL_InsertLast(list, tmp);
+    dynamic_string *op5 = malloc(sizeof(dynamic_string));
+    initialize_string(op5);
+    add_char_to_string(op5, '7');
+    tmp = makeToken(op5, integer);
+    DLTokenL_InsertLast(list, tmp);
 
-//     dynamic_string *op5 = malloc(sizeof(dynamic_string));
-//     initialize_string(op5);
-//     add_char_to_string(op5, '7');
-//     tmp = makeToken(op5, integer);
-//     DLTokenL_InsertLast(list, tmp);
+    token *node;
+    DLTokenL_First(list);
 
-//     token *node;
-//     DLTokenL_First(list);
+    while (DLTokenL_IsActive(list))
+    {
+        node = DLTokenL_GetActive(list);
+        DLTokenL_Next(list);
+    }
 
-//     while (DLTokenL_IsActive(list))
-//     {
-//         node = DLTokenL_GetActive(list);
-//         printf("%s", node->value->string);
-//         DLTokenL_Next(list);
-//     }
-//     printf("\n");
-//     printf("\n");
+    precedence(list);
 
-//     precedence(list);
-
-//     printf("Konec Main\n");
-//     return 0;
-// }
+    printf("\nKonec Main\n");
+    return 0;
+}
+*/
