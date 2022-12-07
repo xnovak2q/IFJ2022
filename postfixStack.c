@@ -48,11 +48,11 @@ void Stack_Push(postStack_t *stack, token* data)
 }
 
 postStack_item_t * Stack_Top_Item(postStack_t* s){
-    if (Stack_IsEmpty(stack))
+    if (Stack_IsEmpty(s))
     {
         return NULL;
     }
-    return &(stack->top);
+    return s->top;
 }
 
 /* Konec postfixStack.c */

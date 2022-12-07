@@ -4,17 +4,16 @@
 #include "scanner.h"
 #include "postfixStack.h"
 
-struct treeNode{
+typedef struct{
     struct postStack_item_t* item;
     struct treeNode* left;
     struct treeNode* right;
-    struct treeNode* next;
-};
+}treeNode;
 
-struct treeNode* makeNode(struct postStack_item_t* item);
-void push(struct treeNode* node, struct treeNode* head);
-struct treeNode* pop(struct treeNode* head);
-struct treeNode* makeTree(struct postStack_t* stack);
+treeNode* makeNode(postStack_item_t* item);
+void push(treeNode* node, treeNode* head);
+treeNode* pop(treeNode* head);
+treeNode* makeTree(postStack_t* stack);
 
 
 

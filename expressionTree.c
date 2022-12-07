@@ -1,32 +1,24 @@
 #include "expressionTree.h"
 
-
-int main(){
-    return 0;
-}
-
-struct treeNode* makeNode(struct postStack_item_t item){
-    treeNode* node = (struct treeNode*) malloc(sizeof(struct treeNode));
+treeNode* makeNode(postStack_item_t* item){
+    treeNode* node = (treeNode*) malloc(sizeof(treeNode));
     node->item = item;
     node->left = NULL;
     node->right = NULL;
-    node->next = NULL;
     return (node);
 }
-void push(treeNode* node, treeNode* head){
-    if(head == NULL) {
-        head = node;
+
+treeNode* makeTree(postStack_t* stack){
+    struct postStack_item* item;
+    item = Stack_Top_Item(stack);
+    treeNode* head = makeNode(item);
+    int type = item->token->tokenType;
+    if(type == sstring || type == ffloat || type == integer || type == exponent || type == variable){
+        return head;
     }
     else{
-        node->next = head;
-        head = node;
+        head->right = (struct treeNode*) makeTree(stack);
+        head->left = (struct treeNode*) makeTree(stack);
+        return head;
     }
-}
-struct treeNode* pop(struct treeNode* head){
-    return NULL;
-}
-
-struct treeNode* makeTree(postStack_t* stack){
-    struct postStack_item_t item = Stack_Top_Item(stack);
-    struct treeNode* head = makeNode(item);
 }
