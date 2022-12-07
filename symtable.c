@@ -8,6 +8,7 @@
 #include "symtable.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 size_t Symtable_HashKey(char *identifier) { //http://www.cse.yorku.ca/~oz/hash.html
     char* str_old = identifier;
@@ -90,7 +91,8 @@ Symbol* Symbol_Make(char* identifier, int dataType) {
     Symbol* newSymbol = (Symbol*)malloc(sizeof(Symbol));
     newSymbol->dataType = dataType;
 
-    char* identifierCopy = (char*)malloc(strlen(identifier));
+    //printf("%s %zu\n", identifier, strlen(identifier));
+    char* identifierCopy = (char*)malloc(strlen(identifier)+1);
     if (!identifierCopy) exit(99);
     strcpy(identifierCopy, identifier);
     newSymbol->identifier = identifierCopy;

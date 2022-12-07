@@ -2,9 +2,9 @@
 // Created by xfuisl00 on 22.10.2022.
 //
 
-#include "parser.c"
-#include "dynamic_string.c"
-#include "basicScannerFunctions.c"
+#include "parser.h"
+#include "dynamic_string.h"
+#include "basicScannerFunctions.h"
 
 int main(){
     runAnalysis();

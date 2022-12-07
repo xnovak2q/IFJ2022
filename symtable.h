@@ -6,6 +6,7 @@
 #define IFJ2022_SYMTABLE_H
 
 #include <stdbool.h>
+#include <stdlib.h>
 
 typedef struct {
     int dataType;                  // datovy typ

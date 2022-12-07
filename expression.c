@@ -136,13 +136,11 @@ treeNode* precedence(DLTokenL *token_list)
     Stack_t stack;
     stack_initialize(&stack);
 
-    bool done = false;
-
     DLTokenL_First(token_list);
     token *exp_token;
 
     dynamic_string *eos_string = malloc(sizeof(dynamic_string));
-    add_str_to_string(eos_string, "eos_string");
+    //add_str_to_string(eos_string, eos_string_static);
     token *eos = makeToken(eos_string, EOS); //$ na spodu zasobniku a listu
 
     if (!stack_push(&stack, EOS, eos, true))
