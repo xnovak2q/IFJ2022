@@ -1,6 +1,6 @@
 //
 // Autor: xnovak2q
-//
+// dynamicky retezec pro tvoreni tokenu
 
 #ifndef _DYNAMIC_STRING_H
 #define _DYNAMIC_STRING_H

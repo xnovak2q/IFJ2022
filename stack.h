@@ -1,3 +1,6 @@
+//  xnovak2q
+//  pomocny zasobnik pro precedencni analyzu
+
 #ifndef STACK_H
 #define STACK_H
 

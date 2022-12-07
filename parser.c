@@ -216,7 +216,6 @@ void functionCall(){
             if (currArgType != typeInt && currArgType != typeFloat && currArgType != nnull) exit(4);
         }
 
-        //TODO generator_variableDeclaration(variableName, , expressionTree); pro lokalni promennou
         DLTokenL_Dispose(expressionTokens);
 
         isFirstArgument = false;
@@ -232,7 +231,6 @@ void functionCall(){
         Symtable_GetFunctionArgsCount(globalFunctionsTable, functionName) != argumentCount)
         exit(4);
     
-    //TODO generate function call
 }
 
 /*
@@ -243,7 +241,6 @@ void whileStatement(){
     if(DLTokenL_FetchNext(tokenList)->tokenType != openBracket) exit(2); // prvni '('
     
     DLTokenL* expressionTokens = consumeExpression(false, 0);
-    //TODO precedencka(expressionTokens);
     DLTokenL_Dispose(expressionTokens);
 
     compoundStatement();
@@ -257,7 +254,6 @@ void ifStatement(){
     if(DLTokenL_FetchNext(tokenList)->tokenType != openBracket) exit(2); // prvni '('
     
     DLTokenL* expressionTokens = consumeExpression(false, 0);
-    //TODO precedencka(expressionTokens);
     DLTokenL_Dispose(expressionTokens);
 
     compoundStatement();
@@ -359,7 +355,6 @@ void functionDefinition(){
     
     if (DLTokenL_FetchNext(tokenList)->tokenType == closeBracket)
     {
-        //TODO function without parameters
     } else {
         DLTokenL_UnFetchNext(tokenList); // zpet na ->(<-
         while (DLTokenL_GetLast(tokenList)->tokenType != closeBracket)
@@ -407,7 +402,6 @@ void loadFunctionDefinition(){
     
     if (DLTokenL_FetchNext(tokenList)->tokenType == closeBracket)
     {
-        //TODO function without parameters
     } else {
         DLTokenL_UnFetchNext(tokenList); // zpet na ->(<-
         while (DLTokenL_GetLast(tokenList)->tokenType != closeBracket)

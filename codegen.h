@@ -30,8 +30,5 @@ typedef struct output_code{
     int while_lvl;
 }out_code;
 
-//TODO deklarace funkci
-
-
 
 #endif //IFJ22_CODEGEN_H

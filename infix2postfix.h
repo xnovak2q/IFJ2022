@@ -1,5 +1,6 @@
 //  prevod infixoveho zapisu na postfixovy
 //  inspirovano domacim ukolem z IAL "c204"
+//  xnovak2q
 
 #ifndef INFIX2POSTFIX_H
 #define INFIX2POSTFIX_H

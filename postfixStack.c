@@ -1,4 +1,6 @@
 
+//  xnovak2q
+//  pomocny zasobnik pro postfix zapis
 #include "postfixStack.h"
 
 // inicializace zasobniku

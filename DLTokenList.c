@@ -28,7 +28,6 @@ void DLTokenL_Print(DLTokenL *list){
 		if (currTypeIndentation > 0)
 			for(size_t indent_i = 0; indent_i < currTypeIndentation; indent_i++) printf(" ");
 		
-		//printf(" (%s)\033[0m\n",tokenTypos[currElement->token->tokenType]);
 		currElement = currElement->nextElement; i++;
 		printf("\033[0m\n");
 	}
@@ -44,7 +43,6 @@ token* DLTokenL_FetchNext(DLTokenL *list){
 		DLTokenL_InsertLast(list, GetToken());
 	}
 
-    //printf("Fetch token: %s (%s)\n",DLTokenL_GetLast(list)->value->string, tokenTypos[DLTokenL_GetLast(list)->tokenType]);
 	return DLTokenL_GetLast(list);
 }
 
@@ -52,7 +50,6 @@ token* DLTokenL_FetchNext(DLTokenL *list){
 * Vrátit poslední token na vstup
 */
 void DLTokenL_UnFetchNext(DLTokenL *list){
-	//printf("UnFetch token: %s (%s)\n",DLTokenL_GetLast(list)->value->string, tokenTypos[DLTokenL_GetLast(list)->tokenType]);
 	UnGetToken(DLTokenL_GetLast(list));
 	DLTokenL_DeleteLast(list);
 }

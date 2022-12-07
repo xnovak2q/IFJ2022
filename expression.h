@@ -1,3 +1,6 @@
+//  xnovak2q
+//  Zpracovani vyrazu pomoci precedencni analyzy
+
 #ifndef PRECEDENCE_H
 #define PRECEDENCE_H
 

@@ -9,17 +9,6 @@
 
 
 
-//TODO void codegen_push_variable(char* var){}
-//TODO: predrazeni pred while
-/*
-*stack
-*if print
-*while print
-*assignment
-*builtin
-*operations
-*/
-
 /// @brief funkce na alokaci instrukce
 /// @return ukazatel na instrukci
 inst_t* create_new_inst(){
@@ -176,15 +165,10 @@ void codegen_push_nil(){
     }
 }
 
-//void codegen_defvar(char* variable){}
 
-//void codegen_var_assign()
-
-
-/*==============IF=====================TODO while*/
+/*==============IF=====================while*/
 
 void codegen_if_begin(int unif){
-    //stack TODO unique label stackTOP
     if_id++;
     if(!is_while){
         printf("POPS GF@exp\n");
@@ -206,26 +190,7 @@ void codegen_if_end(int unif){
 }
 
 
-/*=======================WHILE================TODO
-
-void codegen_while_begin(){//TODO
-    is_while = 1;
-    
-    printf();
-}
-
-void codegen_while_cond(){
-
-}
-
-void codegen_while_end(){
-
-    printf("JUMP");
-}
-*/
-
 /*=======vestavene fce===========*/
-//TODO param parsing
 void codegen_write(){
     printf("#codegen write function\n");
     printf("JUMP $write$end\n");
@@ -276,38 +241,4 @@ void codegen_func_end(char* funcname){
 
 void codegen_func_call(char* funcname){
     printf("CALL %s", funcname);
-}
-
-/*
-void codegen_oper(tokenType operation){
-    switch (operation)
-    {
-    case add:
-        printf("ADDS\n");
-        break;
-    case sub:
-        printf("SUBS\n");
-        break;
-    default:
-        break;
-    }
-}*/
-
-int main(void){
-    codegen_init();
-    is_while = 1;
-    // cg_ins_last(out, "DEFVAR GF@var\n");
-    // cg_ins_last(out, "PUSHS int@42\n");
-    // cg_ins_last(out, "PUSHS int@10\n");
-    // cg_ins_last(out, "SUBS\n");
-    // cg_ins_last(out, "POPS GF@var\n");
-    // cg_ins_last(out, "WRITE GF@var\n");
-    // codegen_print_prog(out);
-    // codegen_prog_dispose(out);
-    // codegen_print_prog(out);
-
-    // cg_ins_last(out, "POPS GF@var\n");
-    codegen_push_string("testing");
-    codegen_print_prog(out);
-    return 0;
 }
