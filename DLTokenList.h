@@ -1,5 +1,6 @@
 //
 // Autor: xkonec86
+// Dvousměrně vázaný seznam tokenů
 //
 
 #ifndef IFJ2022_DLTOKENLIST_H
@@ -8,22 +9,23 @@
 #include <stdlib.h>
 #include "scanner.h"
 
-/** Prvek dvousměrně vázaného seznamu. */
+/** Uzel dvousměrně vázaného seznamu */
 typedef struct DLTokenLElement {
+	/** Ukazatel na token */
 	token* token;
-	/** Ukazatel na předcházející prvek seznamu. */
+	/** Ukazatel na předcházející uzel seznamu */
 	struct DLTokenLElement *previousElement;
-	/** Ukazatel na následující prvek seznamu. */
+	/** Ukazatel na následující uzel seznamu */
 	struct DLTokenLElement *nextElement;
 } *DLTokenLElementPtr;
 
-/** Dvousměrně vázaný seznam. */
+/** Dvousměrně vázaný seznam */
 typedef struct {
-	/** Ukazatel na první prvek seznamu. */
+	/** Ukazatel na první uzel seznamu */
 	DLTokenLElementPtr firstElement;
-	/** Ukazatel na aktuální prvek seznamu. */
+	/** Ukazatel na aktivní uzel seznamu */
 	DLTokenLElementPtr activeElement;
-	/** Ukazatel na posledni prvek seznamu. */
+	/** Ukazatel na posledni uzel seznamu */
 	DLTokenLElementPtr lastElement;
 } DLTokenL;
 

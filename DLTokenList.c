@@ -1,9 +1,13 @@
 //
 // Autor: xkonec86
+// Dvousměrně vázaný seznam tokenů
 //
 
 #include "DLTokenList.h"
 
+/*
+* Pomocná funkce pro vypsání obsahu seznamu
+*/
 void DLTokenL_Print(DLTokenL *list){
 	DLTokenLElementPtr currElement = list->firstElement;
 	int maxTypeIndentation = 0;
@@ -30,6 +34,9 @@ void DLTokenL_Print(DLTokenL *list){
 	}
 }
 
+/*
+* Načíst do seznamu další token ze vstupu
+*/
 token* DLTokenL_FetchNext(DLTokenL *list){
 	if (list->lastElement != NULL && DLTokenL_GetLast(list)->tokenType == end){
 		DLTokenL_InsertLast(list, makeToken(NULL, end));
@@ -41,16 +48,28 @@ token* DLTokenL_FetchNext(DLTokenL *list){
 	return DLTokenL_GetLast(list);
 }
 
+/*
+* Vrátit poslední token na vstup
+*/
 void DLTokenL_UnFetchNext(DLTokenL *list){
 	//printf("UnFetch token: %s (%s)\n",DLTokenL_GetLast(list)->value->string, tokenTypos[DLTokenL_GetLast(list)->tokenType]);
 	UnGetToken(DLTokenL_GetLast(list));
 	DLTokenL_DeleteLast(list);
 }
+
+/*
+* Vrátit všechny toket na vstup
+*/
 void DLTokenL_UnFetchAll(DLTokenL *list){
 	while (list->lastElement != NULL)
 		DLTokenL_UnFetchNext(list);
 }
 
+/*
+* Vytvoří kopii seznamu od aktivního tokenu po konec
+*
+* return: kopie seznamu
+*/
 DLTokenL* DLTokenL_CopyFromActive(DLTokenL *copiedList){
 	if (!DLTokenL_IsActive(copiedList))
 	{
@@ -72,6 +91,9 @@ DLTokenL* DLTokenL_CopyFromActive(DLTokenL *copiedList){
 	return listCopy;
 }
 
+/*
+* Vytvoří inicializovaný seznam tokenů
+*/
 DLTokenL* DLTokenL_Create(){
 	DLTokenL* list = (DLTokenL*)malloc(sizeof(DLTokenL));
 	list->activeElement = NULL;
@@ -80,11 +102,17 @@ DLTokenL* DLTokenL_Create(){
 	return list;
 }
 
+/*
+* Smaže a uvolní uzel seznamu tokenů
+*/
 void DLTokenLElement_Dispose(struct DLTokenLElement* element){
 	free_token(element->token);
 	free(element);
 }
 
+/*
+* Smaže a uvolní seznam tokenů
+*/
 void DLTokenL_Dispose(DLTokenL *list) {
 	DLTokenLElementPtr currElement = list->firstElement;
 	DLTokenLElementPtr prevElement;
@@ -99,6 +127,9 @@ void DLTokenL_Dispose(DLTokenL *list) {
 	free(list);
 }
 
+/*
+* Uvede seznam tokenů do stavu po inicializaci
+*/
 void DLTokenL_Clear(DLTokenL *list) {
 	DLTokenLElementPtr currElement = list->firstElement;
 	DLTokenLElementPtr prevElement;
@@ -115,6 +146,9 @@ void DLTokenL_Clear(DLTokenL *list) {
 	list->lastElement = NULL;
 }
 
+/*
+* Vloží token na začátek seznamu
+*/
 void DLTokenL_InsertFirst(DLTokenL *list, token* token) {
 	DLTokenLElementPtr newHead = malloc(sizeof(struct DLTokenLElement));
 	if (newHead == NULL)
@@ -137,6 +171,9 @@ void DLTokenL_InsertFirst(DLTokenL *list, token* token) {
 	}
 }
 
+/*
+* Vloží token na konec seznamu
+*/
 void DLTokenL_InsertLast(DLTokenL *list, token* token) {
 	DLTokenLElementPtr newTail = malloc(sizeof(struct DLTokenLElement));
 	if (newTail == NULL)
@@ -159,14 +196,23 @@ void DLTokenL_InsertLast(DLTokenL *list, token* token) {
 	}
 }
 
+/*
+* Nastaví aktivitu na první token
+*/
 void DLTokenL_First(DLTokenL *list) {
 	list->activeElement = list->firstElement;
 }
 
+/*
+* Nastaví aktivitu na poslední token
+*/
 void DLTokenL_Last(DLTokenL *list) {
 	list->activeElement = list->lastElement;
 }
 
+/*
+* Vrátí token ze začátku seznamu
+*/
 token* DLTokenL_GetFirst(DLTokenL *list) {
 	if (list->firstElement == NULL)
 	{
@@ -176,6 +222,9 @@ token* DLTokenL_GetFirst(DLTokenL *list) {
 	return list->firstElement->token;
 }
 
+/*
+* Vrátí token z konce seznamu
+*/
 token* DLTokenL_GetLast(DLTokenL *list) {
 	if (list->lastElement == NULL)
 	{
@@ -185,6 +234,9 @@ token* DLTokenL_GetLast(DLTokenL *list) {
 	return list->lastElement->token;
 }
 
+/*
+* Vrátí uzel z konce seznamu
+*/
 struct DLTokenLElement* DLTokenL_GetLastElement(DLTokenL *list) {
 	if (list->lastElement == NULL){
 		exit(99);
@@ -193,6 +245,9 @@ struct DLTokenLElement* DLTokenL_GetLastElement(DLTokenL *list) {
 	return list->lastElement;
 }
 
+/*
+* Smaže token ze začátku seznamu
+*/
 void DLTokenL_DeleteFirst(DLTokenL *list) {
 	if (list->firstElement == NULL)
 	{
@@ -220,6 +275,9 @@ void DLTokenL_DeleteFirst(DLTokenL *list) {
 	list->firstElement = newHead;
 }
 
+/*
+* Smaže token z konce seznamu
+*/
 void DLTokenL_DeleteLast(DLTokenL *list) {
 	if (list->lastElement == NULL)
 		return;
@@ -238,6 +296,9 @@ void DLTokenL_DeleteLast(DLTokenL *list) {
 	list->lastElement = newTail;
 }
 
+/*
+* Smaže token následující po aktivním
+*/
 void DLTokenL_DeleteAfter(DLTokenL *list) {
 	if (list->activeElement == NULL || list->activeElement->nextElement == NULL)
 	{
@@ -260,6 +321,9 @@ void DLTokenL_DeleteAfter(DLTokenL *list) {
 	free(deletedElement);
 }
 
+/*
+* Smaže token předcházející aktivnímu
+*/
 void DLTokenL_DeleteBefore(DLTokenL *list) {
 	if (list->activeElement == NULL || list->activeElement->previousElement == NULL)
 	{
@@ -282,6 +346,9 @@ void DLTokenL_DeleteBefore(DLTokenL *list) {
 	free(deletedElement);
 }
 
+/*
+* Vloží token za aktivní
+*/
 void DLTokenL_InsertAfter(DLTokenL *list, token* token) {
 	if (list->activeElement == NULL)
 	{
@@ -306,6 +373,9 @@ void DLTokenL_InsertAfter(DLTokenL *list, token* token) {
 	list->activeElement->nextElement = newElement;
 }
 
+/*
+* Vloží token před aktivní
+*/
 void DLTokenL_InsertBefore(DLTokenL *list, token* token) {
 if (list->activeElement == NULL)
 	{
@@ -330,6 +400,9 @@ if (list->activeElement == NULL)
 	list->activeElement->previousElement = newElement;
 }
 
+/*
+* Nastaví aktivitu na další
+*/
 void DLTokenL_Next(DLTokenL *list) {
 	if (list->activeElement == NULL)
 	{
@@ -338,6 +411,9 @@ void DLTokenL_Next(DLTokenL *list) {
 	list->activeElement = list->activeElement->nextElement;
 }
 
+/*
+* Nastaví aktivitu na předchozí
+*/
 void DLTokenL_Previous(DLTokenL *list) {
 	if (list->activeElement == NULL)
 	{
@@ -346,10 +422,16 @@ void DLTokenL_Previous(DLTokenL *list) {
 	list->activeElement = list->activeElement->previousElement;
 }
 
+/*
+* Má nastavenou aktivitu?
+*/
 bool DLTokenL_IsActive(DLTokenL *list) {
 	return list->activeElement != NULL;
 }
 
+/*
+* Vrátí aktivní token
+*/
 token* DLTokenL_GetActive(DLTokenL *list) {
 	if (!DLTokenL_IsActive(list))
 		return NULL;
@@ -357,6 +439,9 @@ token* DLTokenL_GetActive(DLTokenL *list) {
 	return list->activeElement->token;
 }
 
+/*
+* Vrátí počet tokenů v seznamu
+*/
 size_t DLTokenL_GetLength(DLTokenL *list){
 	if (list == NULL) return 0;
 
@@ -371,6 +456,9 @@ size_t DLTokenL_GetLength(DLTokenL *list){
 	return length;
 }
 
+/*
+* Vrátí aktivní uzel
+*/
 DLTokenLElementPtr DLTokenL_GetActiveElement(DLTokenL* list){
     if(!DLTokenL_IsActive(list))
         return NULL;

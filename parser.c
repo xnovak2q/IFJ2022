@@ -13,14 +13,16 @@ Symtable_node* globalFunctionsTable;    // Globální tabulka globálních defin
 bool flag_debug = false;
 bool flag_prolog = true;
 
-bool inFunctionDefinition = false;
-bool returnStatementOccurred = false;
-int currFunctionReturnType;
-int programDepth;
+bool inFunctionDefinition = false;      // Nachází se v definici funkce?
+bool returnStatementOccurred = false;   // Nastal výraz return? - pro definice funkcí
+int currFunctionReturnType;             // Návratový typ momentální funkce - pro definice funkcí
 
+/*
+* Načtení definic funkcí
+*/
 void loadFunctionDefs(){
 
-    /*------------------------------DEFINICE VESTAVĚNÝCH FUNKCÍ------------------------------*/
+    /*============================================== DEFINICE VESTAVĚNÝCH FUNKCÍ ==============================================*/
     char* identifier_reads = (char*)malloc((5 +1)* sizeof(char)); identifier_reads = "reads";
     Symtable_InsertSymbol(&globalFunctionsTable, identifier_reads, nullableString);
     int* args_reads = (int*)malloc(0 * sizeof(int)); Symtable_SetFunctionArgs(globalFunctionsTable, identifier_reads, 0, args_reads);
@@ -65,7 +67,7 @@ void loadFunctionDefs(){
     Symtable_InsertSymbol(&globalFunctionsTable, identifier_chr, typeString);
     int* args_chr = (int*)malloc(1 * sizeof(int)); args_chr[0] = typeInt; Symtable_SetFunctionArgs(globalFunctionsTable, identifier_chr, 1, args_chr);
 
-    /*---------------------------------------------------------------------------------------*/
+    /*=======================================================================================================================================*/
 
     DLTokenL_FetchNext(tokenList);
     while (DLTokenL_GetLast(tokenList)->tokenType != end)
@@ -78,7 +80,9 @@ void loadFunctionDefs(){
     DLTokenL_UnFetchAll(tokenList);
 }
 
-
+/*
+* Syntaktická a sémantická analýza
+*/
 void runAnalysis(){
     globalFunctionsTable = Symtable_Create();
     globalVariablesTable = Symtable_Create();
@@ -86,7 +90,6 @@ void runAnalysis(){
     currVariablesTable = globalVariablesTable;
 
     tokenList = DLTokenL_Create();
-    programDepth = 0;
     
     /*----KONTROLA PROLOGU----*/
     DLTokenL_FetchNext(tokenList);
@@ -131,6 +134,9 @@ void runAnalysis(){
 
 /*========================= L L  G R A M A T I K A =========================*/
 
+/*
+* Zpracování volání funkce
+*/
 void functionCall(){
 
     char* functionName = DLTokenL_GetLast(tokenList)->value->string;
@@ -222,13 +228,16 @@ void functionCall(){
         }
     }
 
-    if (strcmp(functionName, "write") && //není write()
+    if (strcmp(functionName, "write") && //není write() -> kontrola počtu argumentů
         Symtable_GetFunctionArgsCount(globalFunctionsTable, functionName) != argumentCount)
         exit(4);
     
     //TODO generate function call
 }
 
+/*
+* Zpracování výrazu while()
+*/
 void whileStatement(){
 
     if(DLTokenL_FetchNext(tokenList)->tokenType != openBracket) exit(2); // prvni '('
@@ -240,6 +249,9 @@ void whileStatement(){
     compoundStatement();
 }
 
+/*
+* Zpracování výrazu if()
+*/
 void ifStatement(){
 
     if(DLTokenL_FetchNext(tokenList)->tokenType != openBracket) exit(2); // prvni '('
@@ -255,12 +267,23 @@ void ifStatement(){
         elseStatement();
     else DLTokenL_UnFetchNext(tokenList);
 }
+
+/*
+* Zpracování výrazu if()
+*/
 void elseStatement(){
    
     DLTokenL_FetchNext(tokenList);
     compoundStatement();
 }
 
+/*
+* Zpracování složeného výrazu:
+
+* {
+*    statement();
+* }
+*/
 void compoundStatement(){
     if (!is_compoundStatement())
         exit(2);
@@ -321,7 +344,9 @@ void compoundStatement(){
         exit(6);    
 }
 
-
+/*
+* Zpracování definice funkce
+*/
 void functionDefinition(){
     if (!is_functionDefinitionHeader()) exit(2);
     
@@ -364,6 +389,9 @@ void functionDefinition(){
     inFunctionDefinition = false;
 }
 
+/*
+* Načtení definice funkce
+*/
 void loadFunctionDefinition(){
     if (!is_functionDefinitionHeader()) return;
     
@@ -425,6 +453,10 @@ void loadFunctionDefinition(){
     DLTokenL_UnFetchNext(tokenList);
 }
 
+/*
+* Zpracování řádkového výrazu:
+* statement();
+*/
 void lineStatement(){
 
     if (is_functionCall())
@@ -434,6 +466,11 @@ void lineStatement(){
     
 }
 
+/*
+* Zpracování termu
+* 
+* return: seznam tokenů termu
+*/
 DLTokenL* consumeExpression(bool canBeEmpty, int startingRoundBracketCount){
     DLTokenL_Last(tokenList);
 
@@ -482,6 +519,9 @@ DLTokenL* consumeExpression(bool canBeEmpty, int startingRoundBracketCount){
     return returnedList;
 }
 
+/*
+* Zpracování definice proměnné
+*/
 void variableDefinition(){
 
     char* variableName = DLTokenL_GetLast(tokenList)->value->string;
@@ -516,6 +556,9 @@ void variableDefinition(){
     Symtable_InsertSymbol(&currVariablesTable, variableName, variableType);
 }
 
+/*
+* Zpracování výrazu
+*/
 void statement(){
     if(is_ifStatement())   
         ifStatement();
@@ -573,7 +616,6 @@ bool is_lineStatement(){
         }
     }
 
-    //DLTokenL_FetchNext(tokenList);
     bool isLineStatement = DLTokenL_GetLast(tokenList)->tokenType == semicolumn;
 
     for (size_t i = 0; i < fetchedTokensCount; i++)
@@ -722,11 +764,6 @@ int getExpressionDataType(treeNode* root){
                 
             } else exit(7);
 
-        }/*  else if(tokenTypeThis == cmpEqual || tokenTypeThis == notEquals || tokenTypeThis == greater || tokenTypeThis == lower || tokenTypeThis == greaterEqual || tokenTypeThis == lowerEqual){
-            if(expressionTree_generalType(dataTypeRight) == string && expressionTree_generalType(dataTypeLeft) == string){
-                return string;
-                
-            } else exit(7);
-        } */ else return typeBool;
+        } else return typeBool;
     }
 }

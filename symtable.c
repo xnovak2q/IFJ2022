@@ -25,7 +25,7 @@ size_t Symtable_HashKey(char *identifier) {
 }
 
 /*
- * Vytvoreni stromu.
+ * Vytvoření tabulky
  */
 Symtable_node* Symtable_Create() {
     Symtable_node* newSymtable = (Symtable_node*)malloc(sizeof(Symtable_node));
@@ -39,8 +39,7 @@ Symtable_node* Symtable_Create() {
 }
 
 /*
- * Nájdenie uzlu v strome.
- * V prípade úspechu vráti funkcia hodnotu true, v opačnom prípade funckia vráti hodnotu false
+ * Existuje symbol v tabulce?
  */
 bool Symtable_ExistsSymbol(Symtable_node *tree, char* identifier) {
     size_t key = Symtable_HashKey(identifier);
@@ -59,7 +58,7 @@ bool Symtable_ExistsSymbol(Symtable_node *tree, char* identifier) {
 }
 
 /*
- * Vložení symbolu do stromu
+ * Vložení symbolu do tabulky
  */
 void Symtable_InsertSymbol(Symtable_node **tree, char* identifier, int dataType) {
     if((*tree) == NULL){
@@ -97,6 +96,9 @@ Symbol* Symbol_Make(char* identifier, int dataType) {
 
 	return newSymbol;
 }
+/*
+ * Uvolnění symbolu
+ */
 void Symbol_Free(Symbol* symbolToFree) {
     if (symbolToFree){
         if(symbolToFree->identifier) free(symbolToFree->identifier);
