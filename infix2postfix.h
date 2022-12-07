@@ -20,7 +20,7 @@ typedef enum {
     mul_div_p,
     rel_ops_p,
     eq_neq_p,
-    bracket
+    l_bracket_p
 } postTypes;
 
 bool check_operand(token* token);
