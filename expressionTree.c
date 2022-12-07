@@ -9,16 +9,18 @@ treeNode* makeNode(struct DLTokenLElement * item){
 }
 
 treeNode* makeTree(DLTokenL * list){
-    struct DLTokenLElement* item;
-    DLTokenL_Last(list);
+    struct DLTokenLElement* item = malloc(sizeof(struct DLTokenLElement));
     item = DLTokenL_GetActiveElement(list);
-    DLTokenL_Previous(list);
     treeNode* head = makeNode(item);
     int type = item->token->tokenType;
-    if(type == sstring || type == ffloat || type == integer || type == exponent || type == variable){
+    if(type == sstring || type == ffloat || type == integer || type == variable || type == nnull){
+        DLTokenL_Previous(list);
         return head;
     }
     else{
+        DLTokenL_Previous(list);
+        if(!DLTokenL_IsActive(list))
+            return NULL;
         head->right = (struct Node*) makeTree(list);
         head->left = (struct Node*) makeTree(list);
         return head;
