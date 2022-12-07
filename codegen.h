@@ -9,6 +9,11 @@
 
 #include "dynamic_string.h"
 #include "error.h"
+#include "parser.c"
+#include "dynamic_string.c"
+#include "basicScannerFunctions.c"
+
+#include "scanner.h"
 
 /// @brief Prvek dvousmerne vazaneho seznamu pro reprezentaci instrukce
 typedef struct instruction{

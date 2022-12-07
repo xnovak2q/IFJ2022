@@ -8,6 +8,7 @@
 #include "basicScannerFunctions.c"
 #include "codegen.c"
 #include "codegen.h"
+#include "scanner.h"
 
 int main(){
    

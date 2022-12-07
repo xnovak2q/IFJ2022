@@ -87,16 +87,17 @@ void codegen_print_prolog (){
 }
 
 
-
-
-/*variables*/
+/*promenne*/
 static int is_while = 0;
+static int if_id = 0;
+static int while_id = 0;
 out_code* out = NULL;
 
 void codegen_init(){
     out = malloc(sizeof(out_code));
     codegen_print_prolog();
     cg_prog_init(out);
+    printf("DEFVAR GF@expression\n");
 
 }
 
@@ -131,9 +132,8 @@ char* string_converter(char* string2conv){
 
 }
 
-//TODO list init prog
-/*===============PUSH STACK ======================*/
 
+/*===============PUSH STACK ======================*/
 void codegen_push_var(char* var_name){
     if(!is_while){
         printf("PUSHS TF@%s\n", var_name);
@@ -152,7 +152,7 @@ void codegen_push_string(char* string){
     }
     else{
         char* buffer = (char*)malloc(strlen(string_converter(string)) +20);
-        sprintf(buffer, "PUSHS string@%s",string_converter(string));
+        sprintf(buffer, "PUSHS string@%s\n",string_converter(string));
         cg_ins_last(out, buffer);
     }
 }
@@ -185,6 +185,7 @@ void codegen_push_nil(){
 
 void codegen_if_begin(int unif){
     //stack TODO unique label stackTOP
+    if_id++;
     if(!is_while){
         printf("POPS GF@exp\n");
         printf("JUMPIFNEQ if$%d$else GF@exp bool@true\n", unif);
@@ -223,7 +224,7 @@ void codegen_while_end(){
 }
 */
 
-/*=======BUILT IN FUNCS===========*/
+/*=======vestavene fce===========*/
 //TODO param parsing
 void codegen_write(){
     printf("#codegen write function\n");
@@ -238,7 +239,6 @@ void codegen_write(){
     printf("LABEL $write$end\n");
 
 }
-
 
 
 void codegen_defvar(char* varname){
@@ -274,11 +274,11 @@ void codegen_func_end(char* funcname){
     printf("LABEL %s$fun$end\n", funcname);
 }
 
-void codegen_func_call(char* funcname, int){
+void codegen_func_call(char* funcname){
     printf("CALL %s", funcname);
 }
 
-
+/*
 void codegen_oper(tokenType operation){
     switch (operation)
     {
@@ -291,4 +291,23 @@ void codegen_oper(tokenType operation){
     default:
         break;
     }
+}*/
+
+int main(void){
+    codegen_init();
+    is_while = 1;
+    // cg_ins_last(out, "DEFVAR GF@var\n");
+    // cg_ins_last(out, "PUSHS int@42\n");
+    // cg_ins_last(out, "PUSHS int@10\n");
+    // cg_ins_last(out, "SUBS\n");
+    // cg_ins_last(out, "POPS GF@var\n");
+    // cg_ins_last(out, "WRITE GF@var\n");
+    // codegen_print_prog(out);
+    // codegen_prog_dispose(out);
+    // codegen_print_prog(out);
+
+    // cg_ins_last(out, "POPS GF@var\n");
+    codegen_push_string("testing");
+    codegen_print_prog(out);
+    return 0;
 }
