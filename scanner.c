@@ -283,10 +283,6 @@ token* String(){
     initialize_string(string);
     char prevChar;
     while(!isQuot(input) || isBackslash(prevChar)){
-        //TODO escape sekvence
-        if(isBackslash(input)){
-
-        }
         add_char_to_string(string, input);
         input = getchar();
     }

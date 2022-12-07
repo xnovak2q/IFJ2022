@@ -2,18 +2,19 @@
 #define IFJ2022_EXPRESSIONTREE_H
 
 #include "scanner.h"
-#include "postfixStack.h"
+#include "DLTokenList.h"
 
-typedef struct{
-    struct postStack_item_t* item;
-    struct treeNode* left;
-    struct treeNode* right;
+typedef struct Node{
+    struct DLTokenLElement* item;
+    struct Node* left;
+    struct Node* right;
 }treeNode;
 
-treeNode* makeNode(postStack_item_t* item);
+treeNode* makeNode(DLTokenLElementPtr item);
 void push(treeNode* node, treeNode* head);
 treeNode* pop(treeNode* head);
-treeNode* makeTree(postStack_t* stack);
+treeNode* makeTree(DLTokenL * list);
+void print2DUtil(treeNode* root, int space);
 
 
 
