@@ -1,27 +1,24 @@
+//
+//  Created by xsrnak00
+//
+
 #include <stdio.h>
 #include <ctype.h>
 #include "codegen.h"
 #include "parser.h"
 
-//static int while_lvl = 0;
+
 
 //TODO void codegen_push_variable(char* var){}
-//TODO char* string_converter(char* str2convert){}
 //TODO: predrazeni pred while
 /*
-*dll
 *stack
 *if print
-
 *while print
-
 *assignment
 *builtin
 *operations
-
 */
-
-
 
 /// @brief funkce na alokaci instrukce
 /// @return ukazatel na instrukci
@@ -42,12 +39,6 @@ void cg_ins_last(out_code *out, char *instruction){
     inst_t *new = create_new_inst();
 
     add_str_to_string(&new->inst_content, instruction);
-
-    //linking
-    if (!out->first_inst)
-    {
-        out->first_inst = new;
-    }
     
     new->prev_inst = out->last_inst;
     new->next_inst = NULL;
@@ -60,11 +51,11 @@ void cg_ins_last(out_code *out, char *instruction){
 }
 
 
-// void cg_prog_init(out_code *out){
-//     out->first_inst = NULL;
-//     out->last_inst = NULL;
-//     out->while_lvl = 0;
-// }
+void cg_prog_init(out_code *program){
+    program->first_inst = NULL;
+    program->last_inst = NULL;
+    program->while_lvl = 0;
+}
 
 
 void codegen_print_prog(out_code *out){
@@ -78,27 +69,43 @@ void codegen_print_prog(out_code *out){
     }
 }
 //dispose
+void codegen_prog_dispose(out_code *out){
+
+    while (out->first_inst)
+    {   
+        inst_t *tmp = out->first_inst;
+        out->first_inst = out->first_inst->next_inst;
+        free(tmp);
+        tmp = NULL;
+    }
+    out->first_inst = NULL;
+    out->last_inst = NULL;
+}
 
 void codegen_print_prolog (){
     printf(".IFJcode22\n");
 }
 
-void codegen_init(out_code *out){
-    codegen_print_prolog();
-    //cg_prog_init(out);
 
-}
 
 
 /*variables*/
 static int is_while = 0;
+out_code* out = NULL;
+
+void codegen_init(){
+    out = malloc(sizeof(out_code));
+    codegen_print_prolog();
+    cg_prog_init(out);
+
+}
 
 
 char* string_converter(char* string2conv){
     if(string2conv == NULL)
         return NULL;
 
-    if(string2conv[0] == '\0'){ //empty string
+    if(string2conv[0] == '\0'){ //prazdny retezec
         return "";
     }
 
@@ -124,12 +131,29 @@ char* string_converter(char* string2conv){
 
 }
 
-
+//TODO list init prog
 /*===============PUSH STACK ======================*/
+
+void codegen_push_var(char* var_name){
+    if(!is_while){
+        printf("PUSHS TF@%s\n", var_name);
+    }
+    else{
+        char* buffer = (char*)malloc(strlen(var_name) + 20);
+        sprintf(buffer, "PUSHS TF@%s\n", var_name);
+        cg_ins_last(out, buffer);
+        
+    }
+}
 
 void codegen_push_string(char* string){
     if(!is_while){
         printf("PUSHS string@%s",string_converter(string));
+    }
+    else{
+        char* buffer = (char*)malloc(strlen(string_converter(string)) +20);
+        sprintf(buffer, "PUSHS string@%s",string_converter(string));
+        cg_ins_last(out, buffer);
     }
 }
 
@@ -185,7 +209,7 @@ void codegen_if_end(int unif){
 
 void codegen_while_begin(){//TODO
     is_while = 1;
-    out_code->while_lvl++;//legit?
+    
     printf();
 }
 
@@ -199,9 +223,72 @@ void codegen_while_end(){
 }
 */
 
-/*=======BUILT IN FUNCS===========
-
+/*=======BUILT IN FUNCS===========*/
+//TODO param parsing
 void codegen_write(){
+    printf("#codegen write function\n");
+    printf("JUMP $write$end\n");
+    printf("LABEL write\n");
+    printf("PUSHFRAME\n");
+    printf("DEFVAR LF@par1\n");
+    printf("MOVE LF@par1 LF@%%1\n");
+    printf("WRITE LF@par1\n");
+    printf("POPFRAME");
+    printf("RETURN\n");
+    printf("LABEL $write$end\n");
 
 }
-*/
+
+
+
+void codegen_defvar(char* varname){
+    if(!is_while){
+        printf("DEFVAR TF@%s", varname);
+    }
+}
+
+
+void codegen_pops_var(char* varname){
+    if (!is_while){
+        printf("POPS TF@%s", varname);
+    }
+}
+
+/*========FUNKCE===========*/
+
+void codegen_func_begin(char* funcname){
+    printf("JUMP %s$fun$end\n", funcname);
+    printf("LABEL %s", funcname);
+    printf("PUSHFRAME\n");
+    printf("CREATEFRAME\n");
+}
+
+void codegen_func_return(){
+    printf("POPFRAME\n");
+    printf("RETURN\n");
+}
+
+void codegen_func_end(char* funcname){
+    printf("POPFRAME\n");
+    printf("RETURN\n");
+    printf("LABEL %s$fun$end\n", funcname);
+}
+
+void codegen_func_call(char* funcname, int){
+    printf("CALL %s", funcname);
+}
+
+
+void codegen_oper(tokenType operation){
+    switch (operation)
+    {
+    case add:
+        printf("ADDS\n");
+        break;
+    case sub:
+        printf("SUBS\n");
+        break;
+    default:
+        break;
+    }
+}
