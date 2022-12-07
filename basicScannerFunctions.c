@@ -1,17 +1,27 @@
 //
 // Autor: xfuisl00
+// Pomocné funkce pro scanner
 //
 
 #include "basicScannerFunctions.h"
 
+/*
+ * Pole obsahující hodnoty klíčových slov
+*/
 const char *keywords[] = {
         "else", "function", "if", "null", "return", "while"
 };
 
+/*
+ * Pole obsahující hodnoty typů
+*/
 const char *types[] = {
         "float", "int", "string", "void"
 };
 
+/*
+ * Pole obsahující hodnoty nullovatelných typů
+*/
 const char *nullableTypes[] = {
         "?float", "?int", "?string", "?void"
 };
@@ -27,27 +37,35 @@ bool isLetterUnderNumber(char x){
 bool isQuot(char x){
     return x =='"';
 }
+
 bool isBackslash(char x){
     return x == '\\';
 }
+
 bool isDot(char x){
     return x == '.';
 }
+
 bool isE(char x){
     return x == 'E' || x == 'e';
 }
+
 bool isMinus(char x){
     return x == '-';
 }
+
 bool isOpenBracket(char x){
     return x == '(';
 }
+
 bool isCloseBracket(char x){
     return x == ')';
 }
+
 bool isMinusPlus(char x){
     return isMinus(x) || x == '+';
 }
+
 bool isOperator(char x){
     switch (x) {
         case '#':
@@ -67,7 +85,6 @@ bool isOperator(char x){
         case ':':
         case '.':
             return true;
-            break;
         default:
             return isMinusPlus(x) || isEqual(x) || isSlash(x) || isQuestion(x);
     }
@@ -140,10 +157,18 @@ bool isDollar(char x){
     return x == '$';
 }
 
+/*
+ * Funkce vracející true pokud znak v parametru je validní jako další znak po neoperátorovém tokenu.
+ * Po neoperátorovém tokenu je validní znak operátor, mezera nebo EOF
+*/
 bool isValidText(char x){
     return isOperator(x) || isspace(x) || isEOF(x);
 }
 
+/*
+ * Funkce vracející true pokud znak v parametru je validní jako další znak po operátorovém tokenu.
+ * Po operátorovém tokenu je validní znak znak, číslo, undescore, dollar, mezera, uvozovky nebo EOF
+*/
 bool isValidOper(char x){
     return isLetterUnderNumber(x) || isDollar(x) || isspace(x) || isOperator(x) || isQuot(x) || isEOF(x);
 }

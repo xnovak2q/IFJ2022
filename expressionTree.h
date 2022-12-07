@@ -1,3 +1,7 @@
+/*
+ * Autor: xfuisl00
+*/
+
 #ifndef IFJ2022_EXPRESSIONTREE_H
 #define IFJ2022_EXPRESSIONTREE_H
 
@@ -12,7 +16,6 @@ typedef struct Node{
 
 treeNode* makeNode(DLTokenLElementPtr item);
 treeNode* makeTree(DLTokenL * list);
-void print2DUtil(treeNode* root, int space);
 bool expressionTree_token_is_literal(token* token);
 
 enum generalType {

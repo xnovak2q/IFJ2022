@@ -1,5 +1,13 @@
+/*
+ * Autor: xfuisl00
+ * Funkce pro přetvoření double linked listu tokenů výrazu na strom výrazu
+*/
+
 #include "expressionTree.h"
 
+/*
+ * Funkce vytvářející nodu stromu s hodnotou item
+*/
 treeNode* makeNode(struct DLTokenLElement * item){
     treeNode* node = (treeNode*) malloc(sizeof(treeNode));
     node->item = item;
@@ -8,6 +16,9 @@ treeNode* makeNode(struct DLTokenLElement * item){
     return node;
 }
 
+/*
+ * Rekurzivní funkce vracející kořenovou nodu stromu výrazu
+*/
 treeNode* makeTree(DLTokenL * list){
     struct DLTokenLElement* item = malloc(sizeof(struct DLTokenLElement));
     item = DLTokenL_GetActiveElement(list);
@@ -27,23 +38,9 @@ treeNode* makeTree(DLTokenL * list){
     }
 }
 
-#define COUNT 10
-
-void print2DUtil(treeNode* root, int space){
-    if(root == NULL)
-        return;
-    space += COUNT;
-    print2DUtil(root->right, space);
-    printf("\n");
-    for(int i = COUNT;i < space; i++){
-        printf(" ");
-    }
-    printf("%s", root->item->token->value->string);
-    print2DUtil(root->left, space);
-}
-
-
-
+/*
+ * Funkce vracející true pokud je token typu integer, sstring nebo ffloat
+*/
 bool expressionTree_token_is_literal(token* token){
     switch (token->tokenType){
         case integer:
@@ -55,6 +52,9 @@ bool expressionTree_token_is_literal(token* token){
     }
 }
 
+/*
+ * Funkce vracející true pokud má token typ operátoru
+*/
 bool expressionTree_token_is_operator(token* token){
     switch (token->tokenType){
         case concat:
@@ -75,6 +75,10 @@ bool expressionTree_token_is_operator(token* token){
             return false;
     }
 }
+
+/*
+ * Funkce vracející hodnotu podle typu operátorového tokenu
+*/
 int expressionTree_token_operator_generalReturnType(token* token){
     switch (token->tokenType){
         case add:
@@ -96,6 +100,9 @@ int expressionTree_token_operator_generalReturnType(token* token){
     }
 }
 
+/*
+ * Funkce vracející hodnotu
+*/
 int expressionTree_generalType(int dataType){
     switch (dataType){
         case typeInt:
