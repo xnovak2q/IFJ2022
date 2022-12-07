@@ -13,6 +13,18 @@ typedef struct Node{
 treeNode* makeNode(DLTokenLElementPtr item);
 treeNode* makeTree(DLTokenL * list);
 void print2DUtil(treeNode* root, int space);
+bool expressionTree_token_is_literal(token* token);
+
+enum generalType {
+    numeric,
+    string,
+    boolean,
+    invalid
+};
+
+bool expressionTree_token_is_operator(token* token);
+int expressionTree_token_operator_returnType(token* token);
+int expressionTree_generalType(int dataType);
 
 
 

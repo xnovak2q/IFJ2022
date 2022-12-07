@@ -1,33 +1,14 @@
 <?php
 declare(strict_types=1);
-$abc = 1;
-$b = $abc;
 
+$abc = 1===58;
 
-function intFoo(int $abc): int{
-    if($abc){
-        return $abc;
-    } else { $b = $abc;}
+$acc = floatFoo("a");
+floatFoo($acc);
 
-    return $b;
+function floatFoo(string $stringFoo): string
+{
+    return "a"."b";
 }
 
-function no(int $ok): void {
-}
-
-if(1){
-    no(1);
-
-    if(1){
-        no(1);
-    } else {
-        $a = intFoo(1);
-    }
-} else {
-    no(2);
-}
-
-$a = intFoo(2);
-intFoo($a);
-
-no(1); 
+?>

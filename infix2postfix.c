@@ -112,8 +112,9 @@ void doOperation(postStack_t *stack, token *tok, DLTokenL *postfixExpression)
 DLTokenL *infix2postfix(DLTokenL *infixExpression)
 {
     DLTokenL *new_list = DLTokenL_Create();
-    if (!new_list)
+    if (!new_list){
         exit(99);
+    }
 
     postStack_t *stack = (postStack_t *)malloc(sizeof(postStack_t));
     if (!stack)

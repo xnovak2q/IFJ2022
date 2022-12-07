@@ -1,22 +1,24 @@
-/*
- * Binárny vyhľadávací strom — rekurzívna varianta
- *
- * S využitím dátových typov zo súboru btree.h a pripravených kostier funkcií
- * implementujte binárny vyhľadávací strom pomocou rekurzie.
- */
+//
+// Autor: xkonec86
+// Implementace tabulky symbolů metodou BVS
+//
 
 #include "symtable.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-size_t Symtable_HashKey(char *identifier) { //http://www.cse.yorku.ca/~oz/hash.html
+/*
+ * Získání unsigned hashe dle identifikátoru symbolu
+ * Zdroj: http://www.cse.yorku.ca/~oz/hash.html
+ */
+size_t Symtable_HashKey(char *identifier) {
     char* str_old = identifier;
     size_t hashedKey = 5381;
     int c;
 
     while ((c = *identifier++))
-        hashedKey = ((hashedKey << 5) + hashedKey) + c; /* hashedKey * 33 + c */
+        hashedKey = ((hashedKey << 5) + hashedKey) + c; // hashedKey * 33 + c
 
     identifier = str_old;
     return hashedKey;
@@ -57,13 +59,7 @@ bool Symtable_ExistsSymbol(Symtable_node *tree, char* identifier) {
 }
 
 /*
- * Vloženie uzlu do stromu.
- *
- * Pokiaľ uzol so zadaným kľúčom v strome už existuje, nahraďte jeho hodnotu.
- * Inak vložte nový listový uzol.
- *
- * Výsledný strom musí spĺňať podmienku vyhľadávacieho stromu — ľavý podstrom
- * uzlu obsahuje iba menšie kľúče, pravý väčšie.
+ * Vložení symbolu do stromu
  */
 void Symtable_InsertSymbol(Symtable_node **tree, char* identifier, int dataType) {
     if((*tree) == NULL){
@@ -87,26 +83,21 @@ void Symtable_InsertSymbol(Symtable_node **tree, char* identifier, int dataType)
     }
 }
 
+/*
+ * Vytvoření symbolu
+ */
 Symbol* Symbol_Make(char* identifier, int dataType) {
     Symbol* newSymbol = (Symbol*)malloc(sizeof(Symbol));
     newSymbol->dataType = dataType;
 
-    //printf("%s %zu\n", identifier, strlen(identifier));
     char* identifierCopy = (char*)malloc(strlen(identifier)+1);
     if (!identifierCopy) exit(99);
     strcpy(identifierCopy, identifier);
     newSymbol->identifier = identifierCopy;
 
-    //newSymbol->identifier = (char*)malloc(identifier->);
-    //strcpy(newSymbol->identifier, identifier->string);
-    //dynamic_string* newIdentifier = (dynamic_string*)malloc(sizeof(dynamic_string));
-	//initialize_string(newIdentifier);
-	//add_str_to_string(newIdentifier, identifier->string);
-   // newSymbol->identifier = newIdentifier;
 	return newSymbol;
 }
 void Symbol_Free(Symbol* symbolToFree) {
-    //free_string(symbolToFree->identifier);
     if (symbolToFree){
         if(symbolToFree->identifier) free(symbolToFree->identifier);
         free(symbolToFree);
@@ -114,17 +105,7 @@ void Symbol_Free(Symbol* symbolToFree) {
 }
 
 /*
- * Pomocná funkcia ktorá nahradí uzol najpravejším potomkom.
- *
- * Kľúč a hodnota uzlu target budú nahradené kľúčom a hodnotou najpravejšieho
- * uzlu podstromu tree. Najpravejší potomok bude odstránený. Funkcia korektne
- * uvoľní všetky alokované zdroje odstráneného uzlu.
- *
- * Funkcia predpokladá že hodnota tree nie je NULL.
- *
- * Táto pomocná funkcia bude využitá pri implementácii funkcie Symtable_Delete.
- *
- * Funkciu implementujte rekurzívne bez použitia vlastných pomocných funkcií.
+ * Pomocná funkce, která nahradí uzel nejpravějším potomkem
  */
 void Symtable_ReplaceByRightmost(Symtable_node *target, Symtable_node **tree) {
     if((*tree)->right != NULL)
@@ -142,16 +123,7 @@ void Symtable_ReplaceByRightmost(Symtable_node *target, Symtable_node **tree) {
 }
 
 /*
- * Odstránenie uzlu v strome.
- *
- * Pokiaľ uzol so zadaným kľúčom neexistuje, funkcia nič nerobí.
- * Pokiaľ má odstránený uzol jeden podstrom, zdedí ho otec odstráneného uzla.
- * Pokiaľ má odstránený uzol oba podstromy, je nahradený najpravejším uzlom
- * ľavého podstromu. Najpravejší uzol nemusí byť listom!
- * Funkcia korektne uvoľní všetky alokované zdroje odstráneného uzlu.
- *
- * Funkciu implementujte rekurzívne pomocou Symtable_PrintNode a bez
- * použitia vlastných pomocných funkcií.
+ * Odstranění symbolu
  */
 void Symtable_DeleteSymbol(Symtable_node **tree, char* identifier) {
     Symtable_node *tmp = (*tree);
@@ -185,13 +157,7 @@ void Symtable_DeleteSymbol(Symtable_node **tree, char* identifier) {
 }
 
 /*
- * Zrušenie celého stromu.
- *
- * Po zrušení sa celý strom bude nachádzať v rovnakom stave ako po
- * inicializácii. Funkcia korektne uvoľní všetky alokované zdroje rušených
- * uzlov.
- *
- * Funkciu implementujte rekurzívne bez použitia vlastných pomocných funkcií.
+ * Uvedení celé tabulky do stavu po inicializaci
  */
 void Symtable_Clear(Symtable_node **tree) {
     if((*tree) != NULL){
@@ -214,11 +180,7 @@ void Symtable_Dispose(Symtable_node **tree) {
 }
 
 /*
- * Preorder prechod stromom.
- *
- * Pre aktuálne spracovávaný uzol nad ním zavolajte funkciu Symtable_PrintNode.
- *
- * Funkciu implementujte rekurzívne bez použitia vlastných pomocných funkcií.
+ * Preorder průchod stromem
  */
 void Symtable_PrintPreorder(Symtable_node *tree) {
     if(tree != NULL) {
@@ -231,11 +193,7 @@ void Symtable_PrintPreorder(Symtable_node *tree) {
 }
 
 /*
- * Inorder prechod stromom.
- *
- * Pre aktuálne spracovávaný uzol nad ním zavolajte funkciu Symtable_PrintNode.
- *
- * Funkciu implementujte rekurzívne bez použitia vlastných pomocných funkcií.
+ * Inorder průchod stromem
  */
 void Symtable_PrintInorder(Symtable_node *tree) {
     if(tree != NULL) {
@@ -247,11 +205,7 @@ void Symtable_PrintInorder(Symtable_node *tree) {
     }
 }
 /*
- * Postorder prechod stromom.
- *
- * Pre aktuálne spracovávaný uzol nad ním zavolajte funkciu Symtable_PrintNode.
- *
- * Funkciu implementujte rekurzívne bez použitia vlastných pomocných funkcií.
+ * Postorder průchod stromem
  */
 void Symtable_PrintPostorder(Symtable_node *tree) {
     if(tree != NULL) {
@@ -263,6 +217,9 @@ void Symtable_PrintPostorder(Symtable_node *tree) {
     }
 }
 
+/*
+ * Získání datového typu symbolu dle identifikátoru
+ */
 int Symtable_GetType(Symtable_node *tree, char* identifier){
     size_t key = Symtable_HashKey(identifier);
     if(tree != NULL){
@@ -279,6 +236,9 @@ int Symtable_GetType(Symtable_node *tree, char* identifier){
     exit(99);
 }
 
+/*
+ * Získání počtu argumentů funkce dle identifikátoru funkce
+ */
 size_t Symtable_GetFunctionArgsCount(Symtable_node *tree, char* functionName){
     size_t key = Symtable_HashKey(functionName);
     if(tree != NULL){
@@ -295,6 +255,9 @@ size_t Symtable_GetFunctionArgsCount(Symtable_node *tree, char* functionName){
     exit(99);
 }
 
+/*
+ * Získání datového typu argumentu funkce dle identifikátoru funkce a indexu argumentu
+ */
 int Symtable_GetFunctionArgType(Symtable_node *tree, char* functionName, size_t argIndex){
     size_t key = Symtable_HashKey(functionName);
     if(tree != NULL){
@@ -313,6 +276,9 @@ int Symtable_GetFunctionArgType(Symtable_node *tree, char* functionName, size_t 
     exit(99);
 }
 
+/*
+ * Nastaví datové typy argumentů funkce
+ */
 void Symtable_SetFunctionArgs(Symtable_node *tree, char* functionName, size_t argCount, int* argTypes){
     size_t key = Symtable_HashKey(functionName);
     if(tree != NULL){
@@ -374,19 +340,17 @@ char* smtbletokentypos[] = {
     "declare",
     "prolog",
     "comma",
-    "colon"
+    "colon",
+    "typeBool"
 };
-
 /*
- * Pomocná funkcia ktorá vypíše uzol stromu.
+ * Pomocná funkce, která vypíše uzel stromu
  */
 void Symtable_PrintNode(Symtable_node *node) {
     if (!node || !node->symbol)
-        //printf("\x1B[30m[\\\\, \\\\, \\\\]\033[0m\n");
         printf("\x1B[30m[\\\\, \\\\]\033[0m\n");
     else{
         char* type = node->symbol->dataType == -1 ? "\\\\" : smtbletokentypos[node->symbol->dataType];
-        //printf("\x1B[30m[%zu, %s, %s]", node->key, node->symbol->identifier, type);
         printf("\x1B[30m[%s, %s]", node->symbol->identifier, type);
 
         if (node->functionArgs){

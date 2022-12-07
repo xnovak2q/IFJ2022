@@ -1,3 +1,8 @@
+//
+// Autor: xkonec86
+// Syntaktická a sémantická analýza
+//
+
 #ifndef IFJ2022_PARSER_H
 #define IFJ2022_PARSER_H
 #include <stdlib.h>
@@ -42,6 +47,7 @@ bool type_is_nullable(int type);
 
 size_t typeMatchesKey(int type);
 bool types_match(int type_src, int type_dest);
+int getExpressionDataType(treeNode* root);
 
 
 #endif //IFJ2022_PARSER_H

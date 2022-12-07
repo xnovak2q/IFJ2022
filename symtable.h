@@ -1,5 +1,6 @@
 //
-// Created by xkonec86 on 1.11.2022.
+// Autor: xkonec86
+// Implementace tabulky symbolů metodou BVS
 //
 
 #ifndef IFJ2022_SYMTABLE_H
@@ -8,19 +9,20 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+// Symbol
 typedef struct {
-    int dataType;                  // datovy typ
-    char* identifier;              // identifikator
+    int dataType;                  // datový typ
+    char* identifier;              // identifikátor
 } Symbol;
 
-// Uzol stromu
+// Uzel stromu
 typedef struct Symtable_node_t {
-  size_t key;                      // kľúč
+  size_t key;                      // klíč
   Symbol* symbol;                  // obsah
   size_t functionArgsCount;        // počet n typů argumentu, pro tabulku funkcí
   int* functionArgs;               // uspořádaná n-tice datových typů argumentu, pro tabulku funkcí
-  struct Symtable_node_t *left;    // levy potomek
-  struct Symtable_node_t *right;   // pravy potomek
+  struct Symtable_node_t *left;    // levý potomek
+  struct Symtable_node_t *right;   // pravý potomek
 } Symtable_node;
 
 size_t Symtable_HashKey(char *identifier);

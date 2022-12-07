@@ -150,8 +150,9 @@ treeNode* precedence(DLTokenL *token_list)
     dynamic_string *eos_string = malloc(sizeof(dynamic_string));
     token *eos = makeToken(eos_string, EOS); 
 
-    if (!stack_push(&stack, EOS, eos, true))
+    if (!stack_push(&stack, EOS, eos, true)){
         exit(99);
+    }
 
     // vlozeni $ do listu
     DLTokenL_InsertLast(token_list, eos);

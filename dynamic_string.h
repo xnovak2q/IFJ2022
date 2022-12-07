@@ -1,4 +1,6 @@
-/* IFJ 2022 */
+//
+// Autor: xnovak2q
+//
 
 #ifndef _DYNAMIC_STRING_H
 #define _DYNAMIC_STRING_H

@@ -1,5 +1,5 @@
 //
-// Created by xfuisl00 on 15.10.2022.
+// Autor: xfuisl00
 //
 
 #ifndef IFJ2022_BASICSCANNERFUNCTIONS_H

@@ -45,7 +45,8 @@ char* tokenTypos[] = {
     "declare",
     "prolog",
     "comma",
-    "colon"
+    "colon",
+    "typeBool"
 };
 
 token* GetToken() {
@@ -438,7 +439,8 @@ token* Operator(char input){
     }
     if(isValidOper(nextChar)){
         token  * temp = makeToken(string, tokenToMake->tokenType);
-        ungetc(nextChar, stdin);
+        if (isEOF(nextChar)) ungetc('\0', stdin);
+        else ungetc(nextChar, stdin);
         return temp;
     }
     exit(1);

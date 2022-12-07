@@ -1,4 +1,6 @@
-/* IFJ 2022 */
+//
+// Autor: xnovak2q
+//
 
 #include "dynamic_string.h"
 
@@ -18,7 +20,7 @@ void free_string(dynamic_string* string)
 {
     if (string->string)
     {
-        free(string->string);
+        //free(string->string);
         string->allocated_length = 0;
         string->string_length = 0;
     }

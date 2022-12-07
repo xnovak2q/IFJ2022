@@ -1,3 +1,7 @@
+//
+// Autor: xkonec86
+//
+
 #ifndef IFJ2022_DLTOKENLIST_H
 #define IFJ2022_DLTOKENLIST_H
 

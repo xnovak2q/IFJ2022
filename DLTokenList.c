@@ -1,3 +1,7 @@
+//
+// Autor: xkonec86
+//
+
 #include "DLTokenList.h"
 
 void DLTokenL_Print(DLTokenL *list){
@@ -22,6 +26,7 @@ void DLTokenL_Print(DLTokenL *list){
 		
 		//printf(" (%s)\033[0m\n",tokenTypos[currElement->token->tokenType]);
 		currElement = currElement->nextElement; i++;
+		printf("\033[0m\n");
 	}
 }
 
@@ -181,8 +186,9 @@ token* DLTokenL_GetLast(DLTokenL *list) {
 }
 
 struct DLTokenLElement* DLTokenL_GetLastElement(DLTokenL *list) {
-	if (list->lastElement == NULL)
+	if (list->lastElement == NULL){
 		exit(99);
+	}
 
 	return list->lastElement;
 }

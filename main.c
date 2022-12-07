@@ -1,5 +1,5 @@
 //
-// Created by xfuisl00 on 22.10.2022.
+// Autor: xfuisl00 on 22.10.2022.
 //
 
 #include "parser.h"

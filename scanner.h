@@ -1,5 +1,5 @@
 //
-// Created by xfuisl00 on 15.10.2022.
+// Autor: xfuisl00 on 15.10.2022.
 //
 
 #ifndef IFJ2022_SCANNER_H
@@ -60,7 +60,8 @@ enum tokenType {
     prolog,
     comma,
     colon,
-    opperator
+    opperator,
+    typeBool
 };
 
 typedef struct{
