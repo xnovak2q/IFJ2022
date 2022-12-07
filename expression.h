@@ -11,6 +11,7 @@
 
 #define TABLE_SIZE 12
 
+//  nove skupiny typu pro lepsi praci s tabulkou
 typedef enum
 {
     MUL_DIV,
@@ -27,6 +28,7 @@ typedef enum
     DOLLAR
 } prec_table_index;
 
+//  jednotlive pravidla v bunkach precedencni tabulky
 typedef enum
 {
     P, // <

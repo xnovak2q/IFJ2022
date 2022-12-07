@@ -1,10 +1,12 @@
 #include "stack.h"
 
+//  iniciliazace zasobniku
 void stack_initialize(Stack_t *stack)
 {
     stack->top = NULL;
 };
 
+//  vlozeni na vrchol zasobniku
 bool stack_push(Stack_t *stack, item_type type, token *token, bool stop)
 {
     Stack_item_t *tmp = (Stack_item_t *)malloc(sizeof(Stack_item_t));
@@ -22,6 +24,7 @@ bool stack_push(Stack_t *stack, item_type type, token *token, bool stop)
     return true;
 };
 
+//  smazani vrchni polozky ze zasobniku
 bool stack_pop(Stack_t *stack)
 {
     if (!(stack->top))
@@ -34,6 +37,7 @@ bool stack_pop(Stack_t *stack)
     return true;
 };
 
+//  uvolneni vsech polozek ze zasobniku
 bool stack_free(Stack_t *stack)
 {
     if (!(stack))

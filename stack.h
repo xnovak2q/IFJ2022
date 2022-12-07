@@ -13,7 +13,6 @@ typedef enum
     OPE
 } item_type;
 
-// stack for precedence analysis
 typedef struct stack_item
 {
     token *token;
@@ -22,6 +21,7 @@ typedef struct stack_item
     bool stop;
 } Stack_item_t;
 
+// zasobnik pro precedencni analyzu
 typedef struct stack
 {
     Stack_item_t *top;

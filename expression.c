@@ -16,6 +16,7 @@ int prec_table[TABLE_SIZE][TABLE_SIZE] = {
     /*  $  */ {P, P, P, P, P, P, P, P, P, E, P, D},
 };
 
+//  pomocna funkce pro orientaci v precedencni tabulce
 prec_table_index type_to_job(int type)
 {
     switch (type)
@@ -54,6 +55,7 @@ prec_table_index type_to_job(int type)
     }
 }
 
+//  funkce pro vkladani na zasobnik podle typu tokenu
 bool push(Stack_t *stack, token *token)
 {
     switch (token->tokenType)
@@ -75,8 +77,10 @@ bool push(Stack_t *stack, token *token)
     return true;
 }
 
+//  funkce pro redukci podle pravidel
 bool reduce(Stack_t *stack, token *token)
 {
+    // pri volani redukce musi byt na vrcholu zasobniku stop atribut, jinak jde o semantickou chybu
     if (!(stack->top->stop))
     {
         return false;
@@ -92,6 +96,7 @@ bool reduce(Stack_t *stack, token *token)
     // (E) -> E
     if (stack->top->token->tokenType == closeBracket && stack->top->next->stack_type == EXP && stack->top->next->next->token->tokenType == openBracket)
     {
+        // nutno vyhodit vrchol ze zasobniku, pote posunout prvni prvek na druhe misto a opet vyhodit vrchol
         stack_pop(stack);
         stack->top->next->stack_type = stack->top->stack_type;
         stack->top->next->stop = stack->top->stop;
@@ -100,6 +105,7 @@ bool reduce(Stack_t *stack, token *token)
         return true;
     }
 
+    //  pomocne promenne pro vyuziti switche
     int op1 = stack->top->stack_type;
     int op2 = stack->top->next->token->tokenType;
     int op3 = stack->top->next->next->stack_type;
@@ -107,6 +113,7 @@ bool reduce(Stack_t *stack, token *token)
     if (op1 != EXP || op3 != EXP)
         return false;
 
+    // E op E -> E
     switch (op2)
     {
     case add:
@@ -131,21 +138,22 @@ bool reduce(Stack_t *stack, token *token)
 
 treeNode* precedence(DLTokenL *token_list)
 {
+    //  prvotni inicializace
     DLTokenL* newlist = DLTokenL_Create();
-    // printf("Start precedence\n");
     Stack_t stack;
     stack_initialize(&stack);
 
     DLTokenL_First(token_list);
     token *exp_token;
 
+    //$ na spodu zasobniku
     dynamic_string *eos_string = malloc(sizeof(dynamic_string));
-    //add_str_to_string(eos_string, eos_string_static);
-    token *eos = makeToken(eos_string, EOS); //$ na spodu zasobniku a listu
+    token *eos = makeToken(eos_string, EOS); 
 
     if (!stack_push(&stack, EOS, eos, true))
         exit(99);
 
+    // vlozeni $ do listu
     DLTokenL_InsertLast(token_list, eos);
 
     int input_symbol;
@@ -154,13 +162,10 @@ treeNode* precedence(DLTokenL *token_list)
     //  while podminka konec listu
     while (DLTokenL_IsActive(token_list))
     {
-        // printf("----------------------------\n");
         exp_token = DLTokenL_GetActive(token_list);
-        // printf("Actual token: %s\n", exp_token->value->string);
-        // printf("Top stack type: %d\n", stack.top->stack_type);
-        // printf("Top stack value: %s\n", stack.top->token->value->string);
 
         input_symbol = exp_token->tokenType;
+
         // hledam TERMY a NON TERMY
         if (stack.top->stack_type != EXP)
         {
@@ -171,116 +176,39 @@ treeNode* precedence(DLTokenL *token_list)
             top_symbol = stack.top->next->token->tokenType;
         }
 
-        // printf("Input symbol: %d\n", input_symbol);
-        // printf("Top symbol: %d\n", top_symbol);
-
         switch (prec_table[type_to_job(top_symbol)][type_to_job(input_symbol)])
         {
         case R:
-            //  redukce
-            // printf("REDUKCE\n");
+            //  reduce
             if (!reduce(&stack, exp_token))
                 exit(2);
-            // printf("Prosel jsem redukci\n");
             break;
         case P:
             //  push
-            // printf("PUSH\n");
             if (!push(&stack, exp_token))
-                exit(99); //    TODO co za chybu
-            // Ziskani noveho tokenu
+                exit(99);
             DLTokenL_Next(token_list);
             break;
         case S:
-            //  = equal
-            // printf("EQUAL\n");
+            //  equal
             if (!stack_push(&stack, OPE, exp_token, true))
-                exit(99); //    TODO co za chybu
+                exit(99);
             // Ziskani noveho tokenu
             DLTokenL_Next(token_list);
             break;
         case D:
             //  done
-            // printf("----------------------------\n");
-            //printf("End precedence\n");
+            //  tvorba postfixoveho zapisu
             newlist = infix2postfix(token_list);
-            struct Node* node;
+            treeNode* node;
             DLTokenL_Last(newlist);
+            //  tvorba stromu z postfixoveho zapisu
             node = makeTree(newlist);
-            //print2DUtil(node, 0);
-
             return node;
         case E:
             //  error
-            exit(2); //    TODO co za chybu
+            exit(2);
             break;
         }
     }
 };
-/*
-int main(void)
-{
-    DLTokenL* list;
-    list = DLTokenL_Create();
-    // printf("List done\n");
-
-    dynamic_string *op10 = malloc(sizeof(dynamic_string));
-    initialize_string(op10);
-    add_char_to_string(op10, '(');
-    token* tmp = makeToken(op10, openBracket);
-    DLTokenL_InsertLast(list, tmp);
-
-    dynamic_string *op1 = malloc(sizeof(dynamic_string));
-    initialize_string(op1);
-    add_char_to_string(op1, 'a');
-    tmp = makeToken(op1, variable);
-    DLTokenL_InsertLast(list, tmp);
-    // printf("Op1 done\n");
-
-    dynamic_string *op2 = malloc(sizeof(dynamic_string));
-    initialize_string(op2);
-    add_char_to_string(op2, '+');
-    tmp = makeToken(op2, add);
-    DLTokenL_InsertLast(list, tmp);
-    // printf("Op2 done\n");
-
-    dynamic_string *op3 = malloc(sizeof(dynamic_string));
-    initialize_string(op3);
-    add_char_to_string(op3, 'b');
-    tmp = makeToken(op3, variable);
-    DLTokenL_InsertLast(list, tmp);
-    // printf("Op3 done\n");
-
-    dynamic_string *op11 = malloc(sizeof(dynamic_string));
-    initialize_string(op11);
-    add_char_to_string(op11, ')');
-    tmp = makeToken(op11, closeBracket);
-    DLTokenL_InsertLast(list, tmp);
-
-    dynamic_string *op4 = malloc(sizeof(dynamic_string));
-    initialize_string(op4);
-    add_char_to_string(op4, '*');
-    tmp = makeToken(op4, mul);
-    DLTokenL_InsertLast(list, tmp);
-
-    dynamic_string *op5 = malloc(sizeof(dynamic_string));
-    initialize_string(op5);
-    add_char_to_string(op5, '7');
-    tmp = makeToken(op5, integer);
-    DLTokenL_InsertLast(list, tmp);
-
-    token *node;
-    DLTokenL_First(list);
-
-    while (DLTokenL_IsActive(list))
-    {
-        node = DLTokenL_GetActive(list);
-        DLTokenL_Next(list);
-    }
-
-    precedence(list);
-
-    printf("\nKonec Main\n");
-    return 0;
-}
-*/

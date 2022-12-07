@@ -1,5 +1,6 @@
 #include "infix2postfix.h"
 
+//  funkce vraci zda se jedna o operand nebo ne
 bool check_operand(token *token)
 {
     switch (token->tokenType)
@@ -15,6 +16,7 @@ bool check_operand(token *token)
     }
 }
 
+// funkce vraci zda se jedna o operator nebo ne
 bool check_operator(token *token)
 {
     switch (token->tokenType)
@@ -36,6 +38,7 @@ bool check_operator(token *token)
     }
 }
 
+//  funkce vraci typ tokenu
 postTypes get_operator(token *token)
 {
     switch (token->tokenType)
@@ -60,6 +63,7 @@ postTypes get_operator(token *token)
     }
 }
 
+//  zpracovani vnitrku zavorek
 void untilLeftPar(postStack_t *stack, DLTokenL *postfixExpression)
 {
     token *tmp;
@@ -75,6 +79,7 @@ void untilLeftPar(postStack_t *stack, DLTokenL *postfixExpression)
     }
 }
 
+//  zpracovani operatoru a jeho precedence
 void doOperation(postStack_t *stack, token *tok, DLTokenL *postfixExpression)
 {
     if (Stack_IsEmpty(stack))
@@ -86,6 +91,9 @@ void doOperation(postStack_t *stack, token *tok, DLTokenL *postfixExpression)
     token *tmp = Stack_Top(stack);
     postTypes stack_type = get_operator(tmp);
     postTypes input_type = get_operator(tok);
+
+    //  zjisteni o jaky operator se jedna na zasobniku a o jaky se jedna na vstupu
+    //  a rozuzleni jeho precedence
     if ((stack_type == l_bracket_p) ||
         ((stack_type == plus_minus_dot_p) && (input_type == mul_div_p)) ||
         ((stack_type == rel_ops_p) && (input_type == mul_div_p || input_type == plus_minus_dot_p)) ||
@@ -96,9 +104,11 @@ void doOperation(postStack_t *stack, token *tok, DLTokenL *postfixExpression)
     }
     DLTokenL_InsertLast(postfixExpression, tmp);
     Stack_Pop(stack);
+    // rekurzivni volani
     doOperation(stack, tok, postfixExpression);
 }
 
+// hlavni funkce pro konverzi mezi infix a postfix zapisem
 DLTokenL *infix2postfix(DLTokenL *infixExpression)
 {
     DLTokenL *new_list = DLTokenL_Create();
@@ -119,6 +129,7 @@ DLTokenL *infix2postfix(DLTokenL *infixExpression)
     
     token *tok;
     
+    //  hlavni cyklus cele konverze -> iterujeme pres vsechny polozky listu
     while (DLTokenL_IsActive(infixExpression))
     {
         tok = DLTokenL_GetActive(infixExpression);
@@ -133,15 +144,17 @@ DLTokenL *infix2postfix(DLTokenL *infixExpression)
         }
         else if (check_operand(tok))
         {
-            DLTokenL_InsertLast(new_list, tok); //vytvoreni posledniho prvku
+            DLTokenL_InsertLast(new_list, tok); //vlozeni posledniho prvku
         }
         else if (check_operator(tok))
         {
-            doOperation(stack, tok, new_list);
+            doOperation(stack, tok, new_list); //prisel operator, musi se vyresit jeho precedence
         }
 
         DLTokenL_Next(infixExpression);
     }
+
+    //  cely vyraz byl zpracovan, ale operatory zustaly na zasobniku -> nutno je pridat do seznamu v postfixovem poradi
     while (!Stack_IsEmpty(stack))
     {
         DLTokenL_InsertLast(new_list, Stack_Top(stack));
