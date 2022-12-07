@@ -19,7 +19,7 @@ typedef struct
 
 void Stack_Init ( postStack_t* s );
 bool Stack_IsEmpty ( postStack_t* s );
-token* Stack_Top ( postStack_t* s);
+token* Stack_Top (postStack_t* s);
 void Stack_Pop ( postStack_t* s );
 void Stack_Push ( postStack_t* s, token* c );
 

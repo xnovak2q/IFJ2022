@@ -56,7 +56,7 @@ postTypes get_operator(token *token)
     case lowerEqual:
         return rel_ops_p;
     case openBracket:
-        return bracket;
+        return l_bracket_p;
     }
 }
 
@@ -86,7 +86,7 @@ void doOperation(postStack_t *stack, token *tok, DLTokenL *postfixExpression)
     token *tmp = Stack_Top(stack);
     postTypes stack_type = get_operator(tmp);
     postTypes input_type = get_operator(tok);
-    if ((stack_type == bracket) ||
+    if ((stack_type == l_bracket_p) ||
         ((stack_type == plus_minus_dot_p) && (input_type == mul_div_p)) ||
         ((stack_type == rel_ops_p) && (input_type == mul_div_p || input_type == plus_minus_dot_p)) ||
         ((stack_type == eq_neq_p) && (input_type != eq_neq_p)))
@@ -111,28 +111,43 @@ DLTokenL *infix2postfix(DLTokenL *infixExpression)
         DLTokenL_Dispose(new_list);
         exit(99);
     }
+    
     Stack_Init(stack);
-    DLTokenL_First(infixExpression);
+
+    DLTokenL_First(infixExpression); //asi neni potreba, ale pro jistotu
+    DLTokenL_First(new_list); //asi neni potreba, ale pro jistotu
+    
     token *tok;
-    while (DLTokenL_IsActive(new_list))
+    
+    while (DLTokenL_IsActive(infixExpression))
     {
         tok = DLTokenL_GetActive(infixExpression);
+
         if (tok->tokenType == openBracket)
         {
-            Stack_Push(stack, tok);
+            Stack_Push(stack, tok); //prisla otevrena zavorka, pushuju na stack a ctu dal
         }
         else if (tok->tokenType == closeBracket)
         {
-            untilLeftPar(stack, new_list);
+            untilLeftPar(stack, new_list); //dosla ukoncujici zavorka, zpracovavam vnitrek zavorky
         }
         else if (check_operand(tok))
         {
-            DLTokenL_InsertLast(new_list, tok);
+            DLTokenL_InsertLast(new_list, tok); //vytvoreni posledniho prvku
         }
         else if (check_operator(tok))
         {
             doOperation(stack, tok, new_list);
         }
+
+        DLTokenL_Next(infixExpression);
     }
+    while (!Stack_IsEmpty(stack))
+    {
+        DLTokenL_InsertLast(new_list, Stack_Top(stack));
+        Stack_Pop(stack);
+    }
+    
     free(stack);
+    return new_list;
 }
