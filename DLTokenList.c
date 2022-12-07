@@ -20,7 +20,7 @@ void DLTokenL_Print(DLTokenL *list){
 		if (currTypeIndentation > 0)
 			for(size_t indent_i = 0; indent_i < currTypeIndentation; indent_i++) printf(" ");
 		
-		printf(" (%s)\033[0m\n",tokenTypos[currElement->token->tokenType]);
+		//printf(" (%s)\033[0m\n",tokenTypos[currElement->token->tokenType]);
 		currElement = currElement->nextElement; i++;
 	}
 }
