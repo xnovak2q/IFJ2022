@@ -1,52 +1,8 @@
 #include "scanner.h"
 
-char* tokenTypos[] = {
-    "iff",
-    "eelse",
-    "ffunction",
-    "nnull",
-    "rreturn",
-    "wwhile", 
-    "identificator", 
-    "variable", 
-    "sstring", 
-    "typeInt", 
-    "typeString", 
-    "typeFloat", 
-    "typeVoid",
-    "nullableInt", 
-    "nullableString",
-    "nullableFloat",
-    "nullableVoid",
-    "integer", 
-    "exponent", 
-    "ffloat", 
-    "add", 
-    "sub", 
-    "mul", 
-    "ddiv", 
-    "openBracket", 
-    "closeBracket", 
-    "openCurly", 
-    "closeCurly", 
-    "openSquare", 
-    "closeSquare", 
-    "equal", 
-    "cmpEqual", 
-    "notEquals", 
-    "greater", 
-    "lower", 
-    "greaterEqual", 
-    "lowerEqual", 
-    "semicolumn",
-    "concat",
-    "end",
-    "declare",
-    "prolog",
-    "comma",
-    "colon"
-};
-
+/*
+ * Lexikální analýza
+*/
 token* GetToken() {
     char input = getchar();
     if (isQuestion(input)) {
@@ -75,9 +31,14 @@ token* GetToken() {
         initialize_string(string);
         return makeToken(string, end);
     }
+    exit(1);
 }
 
+/*
+ * Funkce zpracovávající vstup na token prolog
+*/
 token* Prolog() {
+    //Načtení 3 znaků, které mají obsahovat "php"
     char tmp1 = getchar();
     char tmp2 = getchar();
     char tmp3 = getchar();
@@ -106,6 +67,9 @@ token* Prolog() {
     return makeToken(string, prolog);
 }
 
+/*
+ * Funkce zpracovávající vstup na token declare
+*/
 token* Declare(dynamic_string* string){
     char input = getchar();
     if(!isOpenBracket(input)){
@@ -114,6 +78,7 @@ token* Declare(dynamic_string* string){
     free_string(string);
     initialize_string(string);
     input = getchar();
+    //Načítání obsahu závorek
     while(!isCloseBracket(input)){
         add_char_to_string(string,input);
         input = getchar();
@@ -126,12 +91,16 @@ token* Declare(dynamic_string* string){
     return makeToken(string,declare);
 }
 
+/*
+ * Funkce zpracovávající vstup na token type
+*/
 token* Type(char input){
     dynamic_string* string = malloc(sizeof(dynamic_string));
     initialize_string(string);
     add_char_to_string(string, input);
     input = getchar();
-    if(input == '>'){
+    // Pokud na vstupu je ">" není výsledný token type, nýbrž se jedná o konec programu
+    if(input == '>'){ //
         return makeToken(string, end);
     }
     while(isalpha(input)){
@@ -144,6 +113,7 @@ token* Type(char input){
     }
     ungetc(input, stdin);
 
+    //Switche pro získání správného typu tokenu
     switch(isType(*string)){
         case 0: return makeToken(string, typeFloat);
         case 1: return makeToken(string, typeInt);
@@ -163,6 +133,9 @@ token* Type(char input){
     exit(1);
 }
 
+/*
+ * Funkce zpracovávající vstup na token keyword, type nebo identificator
+*/
 token* Word(char input){
     dynamic_string* string = malloc(sizeof(dynamic_string));
     initialize_string(string);
@@ -203,6 +176,9 @@ token* Word(char input){
     return makeToken(string, identificator);
 }
 
+/*
+ * Funkce zpracovávající vstup na token variable
+*/
 token* Variable(){
     dynamic_string* string = malloc(sizeof(dynamic_string));
     initialize_string(string);
@@ -218,6 +194,9 @@ token* Variable(){
     return makeToken(string, variable);
 }
 
+/*
+ * Funkce zpracovávající vstup na token integer, ffloat nebo exponent
+*/
 token* Number(char input){
     dynamic_string* string = malloc(sizeof(dynamic_string));
     initialize_string(string);
@@ -227,10 +206,12 @@ token* Number(char input){
         add_char_to_string(string, input);
         input = getchar();
     }
+    //Pokud přijde na vstup "." pak se jedná o token typu float
     if(isDot(input)){
         add_char_to_string(string, input);
         return Float(string,input);
     }
+    //Pokud přijde na vstup "e" nebo "E" pak se jedná o token typu exponent
     if(isE(input)){
         add_char_to_string(string, input);
         return Exponent(string,input);
@@ -242,6 +223,9 @@ token* Number(char input){
     return makeToken(string, integer);
 }
 
+/*
+ * Funkce zpracovávající vstup na token exponent
+*/
 token* Exponent(dynamic_string* string, char input){
     input = getchar();
     if(isMinusPlus(input)){
@@ -259,6 +243,9 @@ token* Exponent(dynamic_string* string, char input){
     return makeToken(string, exponent);
 }
 
+/*
+ * Funkce zpracovávající vstup na token ffloat
+*/
 token* Float(dynamic_string* string, char input){
     input = getchar();
     while(isdigit(input)){
@@ -276,16 +263,16 @@ token* Float(dynamic_string* string, char input){
     return makeToken(string, ffloat);
 }
 
+/*
+ * Funkce zpracovávající vstup na token sstring
+*/
 token* String(){
     char input = getchar();
     dynamic_string* string = malloc(sizeof(dynamic_string));
     initialize_string(string);
     char prevChar;
+    //Cyklus while končí když na vstupu je "\"" a zároveň předchozí znak není "\"
     while(!isQuot(input) || isBackslash(prevChar)){
-        //TODO escape sekvence
-        if(isBackslash(input)){
-
-        }
         add_char_to_string(string, input);
         input = getchar();
     }
@@ -297,6 +284,9 @@ token* String(){
     return makeToken(string, sstring);
 }
 
+/*
+ * Funkce zpracovávající vstup na operátorové tokeny
+*/
 token* Operator(char input){
     dynamic_string* string = malloc(sizeof(dynamic_string));
     initialize_string(string);
@@ -441,12 +431,16 @@ token* Operator(char input){
     }
     if(isValidOper(nextChar)){
         token  * temp = makeToken(string, tokenToMake->tokenType);
-        ungetc(nextChar, stdin);
+        if (isEOF(nextChar)) ungetc('\0', stdin);
+        else ungetc(nextChar, stdin);
         return temp;
     }
     exit(1);
 }
 
+/*
+ * Funkce na vytvoření tokenu typu type s value string
+*/
 token* makeToken(dynamic_string* string, enum tokenType type){
     token * tokenToMake = malloc(sizeof (token));
     if(!tokenToMake){
@@ -457,10 +451,35 @@ token* makeToken(dynamic_string* string, enum tokenType type){
     return tokenToMake;
 }
 
+/*
+ * Funkce na uvolnění paměti tokenu
+*/
 void free_token(token* token){
     if(token->tokenType == 30)
         return;
-    //printf("freeing token type = %s value = %s", tokenTypos[token->tokenType], token->value->string);
     free_string(token->value);
     free(token);
+}
+
+/*
+ * Funkce vracející hodnotu tokenu zpět na stdin
+*/
+void UnGetToken(token* token){
+    ungetc(' ', stdin);
+    
+    if (token->tokenType == sstring)
+        ungetc('"', stdin);
+
+    for(size_t i = token->value->string_length; i > 0; i--)
+        ungetc(token->value->string[i-1], stdin);
+        
+    if (token->tokenType == variable)
+        ungetc('$', stdin);
+    else if (token->tokenType == sstring)
+        ungetc('"', stdin);
+    else if (token->tokenType == end)
+        ungetc('\0', stdin);
+    
+    ungetc(' ', stdin);
+    free_token(token);
 }

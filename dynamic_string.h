@@ -1,4 +1,6 @@
-/* IFJ 2022 */
+//
+// Autor: xnovak2q
+// dynamicky retezec pro tvoreni tokenu
 
 #ifndef _DYNAMIC_STRING_H
 #define _DYNAMIC_STRING_H
@@ -16,17 +18,17 @@ typedef struct dynamic_string
     int allocated_length;
 } dynamic_string;
 
-//initialization of string
-//length set to 1 and on the end of the string the end of string is added
+//incializace retezce
+//delka je 1 a na konec retezce je vlozen ukoncovaci symbol
 void initialize_string(dynamic_string* string);
 
-//free allocated memory used for dynamic string
+//uvolneni pameti pouzivane dynamickym retezcem
 void free_string(dynamic_string* string);
 
-//adding a single character to a dynamic string
+//vlozeni jednoho znaku do retezce a zvetseni jeho delky jestli je potreba
 void add_char_to_string(dynamic_string* string, char character);
 
-//adding whole string to a dynamic string
+//pridani noveho retezce do aktualniho retezce a zvetseni jeho alokovane pameti
 void add_str_to_string(dynamic_string* string, char* new_string);
 
 #endif // _DYNAMIC_STRING_H

@@ -1,0 +1,14 @@
+<?php
+declare(strict_types=1);
+
+$abc = 1===58;
+
+$acc = floatFoo("a");
+floatFoo($acc);
+
+function floatFoo(string $stringFoo): string
+{
+    return "a"."b";
+}
+
+?>

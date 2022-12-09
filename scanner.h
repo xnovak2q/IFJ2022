@@ -1,5 +1,5 @@
 //
-// Created by xfuisl00 on 15.10.2022.
+// Autor: xfuisl00 on 15.10.2022.
 //
 
 #ifndef IFJ2022_SCANNER_H
@@ -32,6 +32,7 @@ enum tokenType {
     nullableString,
     nullableFloat,
     nullableVoid,
+    typeAny,
     integer,
     exponent,
     ffloat,
@@ -59,7 +60,8 @@ enum tokenType {
     prolog,
     comma,
     colon,
-    opperator
+    opperator,
+    typeBool
 };
 
 typedef struct{
@@ -80,4 +82,5 @@ token* String();
 token* Operator(char input);
 token* makeToken(dynamic_string *string, enum tokenType type);
 void free_token(token* token);
+void UnGetToken(token* token);
 #endif //IFJ2022_SCANNER_H
